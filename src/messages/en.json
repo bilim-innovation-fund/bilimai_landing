@@ -1,0 +1,69 @@
+{
+  "meta": {
+    "title": "BilimAI - AI Tool to empower Teachers",
+    "description": "BilimAI is an AI-powered platform that helps teachers generate structured lessons from any topic and supports students with intelligent learning tools."
+  },
+  "nav": {
+    "contactUs": "Contact Us",
+    "features": "Features",
+    "lessonGenerator": "Lesson Generator",
+    "faq": "FAQ",
+    "selectLanguage": "Select Language"
+  },
+  "hero": {
+    "badge": "Product is in Development",
+    "badgeLabel": "Soon!",
+    "title": "AI Built to Empower Education",
+    "subtitle": "<muted>BilimAI </muted><dark>transforms ideas and curriculum into structured lessons</dark><muted>, while giving students powerful </muted><dark>tools to learn, explore, and grow.</dark>"
+  },
+  "features": {
+    "title": "A Complete AI Platform for Modern Education",
+    "subtitle": "From lesson creation to personalized learning and real-time insights.",
+    "card1Title": "AI Lesson Generator",
+    "card1Desc": "Generate structured lessons from any topic in seconds.",
+    "card2Title": "Student AI Learning",
+    "card2Desc": "Personalized explanations and practice for every student.",
+    "card3Title": "Learning Insights",
+    "card3Desc": "Understand student progress and identify learning gaps."
+  },
+  "howItWorks": {
+    "title": "From Topic to Learning Experience",
+    "step1Title": "Start With Any Topic",
+    "step1Desc": "Choose a topic or enter your own. The platform understands the subject and creates a structured lesson outline instantly.",
+    "step2Title": "AI Builds the Lesson Content",
+    "step2Desc": "The system turns the outline into a complete lesson with explanations, examples, and practice — ready to use or edit.",
+    "feature1Title": "Interactive Lesson Elements",
+    "feature1Desc": "Videos, simulations, quizzes, and activities that keep lessons engaging.",
+    "feature2Title": "Lesson Marketplace",
+    "feature2Desc": "Share, discover, and adapt lessons from the community.",
+    "feature3Title": "Government-Aligned Knowledge",
+    "feature3Desc": "Aligned with curriculum standards and trusted educational sources."
+  },
+  "testimonials": {
+    "title": "Trusted by top teachers",
+    "quote": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "author": "Yesbol Duyseev",
+    "role": "Physics"
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "subtitle": "Find quick answers to common questions about BilimAI.",
+    "q1": "What is BilimAI?",
+    "a1": "BilimAI is an AI-powered educational platform that helps teachers create structured lessons and provides students with personalized learning tools.",
+    "q2": "Does BilimAI replace teachers?",
+    "a2": "No. BilimAI is designed to empower teachers, not replace them. It automates lesson preparation so teachers can focus on what matters most — teaching and connecting with students.",
+    "q3": "Can teachers create lessons outside the curriculum?",
+    "a3": "Yes. While the platform supports curriculum-aligned content, teachers are free to create lessons on any topic they choose.",
+    "q4": "What does an AI-generated lesson include?",
+    "a4": "Each lesson includes structured explanations, examples, practice questions, and optional interactive elements like quizzes and activities.",
+    "q5": "Will teachers be able to share lessons?",
+    "a5": "Yes. The upcoming Lesson Marketplace will allow teachers to share, discover, and adapt lessons created by the community.",
+    "q6": "Is the platform available now?",
+    "a6": "The platform is currently in development. Stay tuned for updates on our launch date."
+  },
+  "footer": {
+    "followUs": "Follow us on:",
+    "quickLinks": "Quick Links",
+    "copyright": "BilimAI © 2026"
+  }
+}

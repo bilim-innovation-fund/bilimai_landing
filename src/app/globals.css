@@ -1,26 +1,329 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Colors from Framer design tokens */
+  --color-primary: #ffd54a;
+  --color-primary-light: #ffeba8;
+  --color-primary-alpha-20: #ffd54a33;
+  --color-primary-alpha-50: #ffd54a80;
+  --color-primary-alpha-10: #ffd54a1a;
+
+  --color-dark: #101011;
+  --color-dark-secondary: #2b2b2c;
+  --color-text-secondary: #606266;
+  --color-text-muted: #a7a7a7;
+
+  --color-bg: #f9f8f4;
+  --color-bg-light: #ffffff;
+  --color-white: #fff;
+  --color-black: #000;
+
+  --color-dark-overlay: #101011cc;
+  --color-dark-border: #10101166;
+
+  /* Font family */
+  --font-sans: "Switzer", "Inter", sans-serif;
+
+  /* Max content width */
+  --max-width-content: 1350px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Switzer font faces */
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/switzer/Switzer-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/switzer/Switzer-Italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/switzer/Switzer-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/switzer/Switzer-MediumItalic.otf") format("opentype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/switzer/Switzer-Semibold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/switzer/Switzer-SemiboldItalic.otf") format("opentype");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/switzer/Switzer-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/switzer/Switzer-BoldItalic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/switzer/Switzer-Extrabold.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/switzer/Switzer-Black.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Global reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: var(--color-dark);
+  position: relative;
 }
+
+/* Grid background overlay matching Framer */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("/images/9c47fOR3CNoSsEtr6IEYJoKM.svg");
+  background-repeat: repeat;
+  background-position: left top;
+  background-size: 88px auto;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ========== Responsive Styles ========== */
+
+/* --- Hero --- */
+@media (max-width: 809px) {
+  .hero-section {
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: unset !important;
+  }
+  .hero-text-container {
+    padding: 40px 15px !important;
+    max-width: 100% !important;
+  }
+  .hero-text-inner {
+    max-width: 100% !important;
+    gap: 20px !important;
+  }
+  .hero-title {
+    font-size: 36px !important;
+  }
+  .hero-subtitle {
+    font-size: 16px !important;
+  }
+  .hero-image {
+    width: 100% !important;
+    flex: none !important;
+    border-radius: 0 !important;
+  }
+  .hero-image img {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+}
+@media (min-width: 810px) and (max-width: 1199px) {
+  .hero-text-container {
+    padding: 44px 20px !important;
+  }
+  .hero-title {
+    font-size: 64px !important;
+  }
+}
+
+/* --- Navigation --- */
+@media (max-width: 809px) {
+  .nav-container {
+    padding: 0 15px !important;
+  }
+}
+
+/* --- Logo Marquee --- */
+@media (max-width: 809px) {
+  .marquee-section {
+    padding-top: 66px !important;
+  }
+  .marquee-wrapper {
+    padding: 0 15px !important;
+  }
+}
+
+/* --- Features --- */
+@media (max-width: 809px) {
+  .features-section {
+    padding-top: 74px !important;
+  }
+  .features-container {
+    padding: 0 15px !important;
+  }
+  .features-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .features-header-title {
+    font-size: 30px !important;
+  }
+  .features-header-subtitle {
+    font-size: 16px !important;
+  }
+}
+@media (min-width: 810px) and (max-width: 1199px) {
+  .features-container {
+    padding: 0 20px !important;
+  }
+}
+
+/* --- How It Works --- */
+@media (max-width: 809px) {
+  .howitworks-container {
+    padding: 0 15px !important;
+    gap: 45px !important;
+  }
+  .howitworks-title {
+    font-size: 30px !important;
+  }
+  .howitworks-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .howitworks-icons {
+    flex-direction: column !important;
+    gap: 30px !important;
+  }
+  .howitworks-section {
+    margin-top: 40px !important;
+  }
+}
+@media (min-width: 810px) and (max-width: 1199px) {
+  .howitworks-container {
+    padding: 0 20px !important;
+    gap: 50px !important;
+  }
+}
+
+/* --- Testimonials --- */
+@media (max-width: 809px) {
+  .testimonials-section {
+    padding-top: 74px !important;
+  }
+  .testimonials-container {
+    padding: 0 15px !important;
+  }
+  .testimonials-grid {
+    flex-direction: column !important;
+    gap: 40px !important;
+  }
+  .testimonials-title {
+    font-size: 30px !important;
+  }
+}
+@media (min-width: 810px) and (max-width: 1199px) {
+  .testimonials-section {
+    padding-top: 120px !important;
+  }
+  .testimonials-grid {
+    gap: 60px !important;
+  }
+}
+
+/* --- FAQ --- */
+@media (max-width: 809px) {
+  .faq-section {
+    padding: 74px 0 80px !important;
+  }
+  .faq-container {
+    padding: 0 15px !important;
+    gap: 50px !important;
+  }
+  .faq-title {
+    font-size: 30px !important;
+  }
+  .faq-subtitle {
+    font-size: 16px !important;
+  }
+  .faq-accordion {
+    max-width: 100% !important;
+  }
+}
+
+/* --- Footer --- */
+@media (max-width: 809px) {
+  .footer-section {
+    padding: 80px 0 40px !important;
+  }
+  .footer-container {
+    padding: 0 15px !important;
+    gap: 30px !important;
+  }
+  .footer-grid {
+    flex-direction: column !important;
+    gap: 40px !important;
+  }
+  .footer-menu {
+    flex: none !important;
+    width: 100% !important;
+  }
+  .footer-about {
+    align-self: auto !important;
+    gap: 30px !important;
+  }
+}
+@media (min-width: 810px) and (max-width: 1199px) {
+  .footer-container {
+    padding: 0 20px !important;
+  }
+  .footer-section {
+    padding: 90px 0 40px !important;
+  }
+}
+
