@@ -39,6 +39,7 @@ export function HowItWorks() {
         alignItems: "center",
         width: "100%",
         marginTop: 80,
+        scrollMarginTop: 88,
         backgroundColor: "#f9f8f4",
         borderTop: "1px solid rgba(96, 98, 102, 0.05)",
         borderBottom: "1px solid rgba(96, 98, 102, 0.05)",

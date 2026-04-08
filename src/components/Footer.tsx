@@ -1,18 +1,35 @@
 "use client";
 
+import type { MouseEvent } from "react";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
+import { Link, usePathname } from "@/i18n/navigation";
 import { AnimateIn } from "./AnimateIn";
 
 const footerLinks = [
-  { labelKey: "features" as const, href: "#features" },
-  { labelKey: "lessonGenerator" as const, href: "#lesson-generator" },
-  { labelKey: "faq" as const, href: "#faq" },
+  { labelKey: "features" as const, sectionId: "features" },
+  { labelKey: "lessonGenerator" as const, sectionId: "lesson-generator" },
+  { labelKey: "faq" as const, sectionId: "faq" },
 ];
 
 export function Footer() {
   const t = useTranslations("footer");
   const tNav = useTranslations("nav");
+  const pathname = usePathname();
+
+  function handleSectionClick(sectionId: string, event: MouseEvent<HTMLAnchorElement>) {
+    if (pathname !== "/") {
+      return;
+    }
+
+    const target = document.getElementById(sectionId);
+    if (!target) {
+      return;
+    }
+
+    event.preventDefault();
+    window.history.pushState(null, "", `#${sectionId}`);
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   return (
     <footer
@@ -197,9 +214,11 @@ export function Footer() {
                 }}
               >
                 {footerLinks.map((link) => (
-                  <a
+                  <Link
                     key={link.labelKey}
-                    href={link.href}
+                    href={{ pathname: "/", hash: link.sectionId }}
+                    scroll={pathname !== "/"}
+                    onClick={(event) => handleSectionClick(link.sectionId, event)}
                     style={{
                       fontSize: 16,
                       fontWeight: 500,
@@ -210,7 +229,7 @@ export function Footer() {
                     }}
                   >
                     {tNav(link.labelKey)}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>

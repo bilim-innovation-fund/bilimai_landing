@@ -112,6 +112,8 @@
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
 }
 
 body {
@@ -138,6 +140,12 @@ body::after {
 body > * {
   position: relative;
   z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 /* ========== Responsive Styles ========== */
@@ -326,4 +334,3 @@ body > * {
     padding: 90px 0 40px !important;
   }
 }
-

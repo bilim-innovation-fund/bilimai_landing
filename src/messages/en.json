@@ -65,5 +65,10 @@
     "followUs": "Follow us on:",
     "quickLinks": "Quick Links",
     "copyright": "BilimAI © 2026"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for doesn't exist or has been moved.",
+    "backHome": "Back to home"
   }
 }

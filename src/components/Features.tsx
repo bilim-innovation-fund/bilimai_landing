@@ -16,6 +16,7 @@ export function Features() {
 
   return (
     <section
+      id="features"
       className="features-section"
       style={{
         display: "flex",
@@ -23,6 +24,7 @@ export function Features() {
         alignItems: "center",
         width: "100%",
         paddingTop: 100,
+        scrollMarginTop: 88,
       }}
     >
       <div

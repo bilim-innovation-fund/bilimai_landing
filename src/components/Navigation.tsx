@@ -2,12 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { useRouter, usePathname } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 
 export function Navigation() {
   const t = useTranslations("nav");
   const locale = useLocale();
-  const router = useRouter();
   const [visible, setVisible] = useState(true);
   const lastScrollY = useRef(0);
 
@@ -21,7 +20,6 @@ export function Navigation() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const pathname = usePathname();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -32,13 +30,6 @@ export function Navigation() {
   ];
 
   const currentLocale = locales.find((l) => l.code === locale) ?? locales[0];
-
-  function selectLocale(code: string) {
-    setDropdownOpen(false);
-    if (code !== locale) {
-      router.replace(pathname, { locale: code });
-    }
-  }
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -78,7 +69,7 @@ export function Navigation() {
         }}
       >
         {/* Logo */}
-        <a href="/" style={{ display: "block", lineHeight: 0, height: 40, overflow: "hidden" }}>
+        <Link href="/" style={{ display: "block", lineHeight: 0, height: 40, overflow: "hidden" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/logo.svg"
@@ -87,7 +78,7 @@ export function Navigation() {
             height={40}
             style={{ display: "block", width: 116, height: 40, objectFit: "contain" }}
           />
-        </a>
+        </Link>
 
         {/* Right side */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -109,6 +100,7 @@ export function Navigation() {
                 boxShadow: "0 2px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.03)",
               }}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={currentLocale.flag}
                 alt={currentLocale.label}
@@ -134,6 +126,7 @@ export function Navigation() {
                   position: "absolute",
                   top: "calc(100% + 8px)",
                   right: 0,
+                  zIndex: 100,
                   backgroundColor: "white",
                   borderRadius: 16,
                   boxShadow: "0 4px 20px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.04)",
@@ -142,9 +135,11 @@ export function Navigation() {
                 }}
               >
                 {locales.map((l) => (
-                  <button
+                  <Link
                     key={l.code}
-                    onClick={() => selectLocale(l.code)}
+                    href="/"
+                    locale={l.code}
+                    onClick={() => setDropdownOpen(false)}
                     style={{
                       display: "flex",
                       alignItems: "center",
@@ -157,15 +152,17 @@ export function Navigation() {
                       fontSize: 14,
                       fontWeight: 500,
                       color: "#2b2b2c",
+                      textDecoration: "none",
                     }}
                   >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={l.flag}
                       alt={l.label}
                       style={{ width: 18, height: 18, objectFit: "contain" }}
                     />
                     {l.label}
-                  </button>
+                  </Link>
                 ))}
               </div>
             )}

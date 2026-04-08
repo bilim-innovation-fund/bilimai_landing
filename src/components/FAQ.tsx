@@ -19,6 +19,7 @@ export function FAQ() {
         alignItems: "center",
         width: "100%",
         padding: "100px 0 120px",
+        scrollMarginTop: 88,
       }}
     >
       {/* Container */}
