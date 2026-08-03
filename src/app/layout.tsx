@@ -1,4 +1,18 @@
 import "@/app/globals.css";
+import type { Metadata, Viewport } from "next";
+
+export const metadata: Metadata = {
+  title: "Bilim AI — сабақтар, тесттер және сыныптар бір кеңістікте",
+  description:
+    "Bilim AI — сабақтар, оқу бағдарламалары, тесттер мен сыныптарды бір ортада біріктіретін ЖИ платформасы.",
+  icons: {
+    icon: "/images/landing/bilimai-mark.svg",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#f5f6f4",
+};
 
 export default function RootLayout({
   children,
@@ -6,15 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&subset=cyrillic,cyrillic-ext&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="kk">
       <body suppressHydrationWarning>{children}</body>
     </html>
   );
