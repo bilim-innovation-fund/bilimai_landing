@@ -63,7 +63,15 @@ const combinedEventsCover = `${ASSET_ROOT}/marketplace-lessons/combined-events.j
 const graphingLinesCover = `${ASSET_ROOT}/marketplace-lessons/graphing-lines.jpg`
 
 const APP_ORIGIN = (process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "")
-const API_ORIGIN = (process.env.NEXT_PUBLIC_API_ORIGIN || "").replace(/\/$/, "")
+// Env сервера лендинга нам недоступен, поэтому рабочие значения зашиты
+// фолбэками (как у WAITLIST_API_ENDPOINT ниже). При переключении апекса на
+// прод заменить на https://api.app.bilimai.kz / https://app.bilimai.kz.
+const API_ORIGIN = (
+	process.env.NEXT_PUBLIC_API_ORIGIN || "https://api.dev.bilimai.kz"
+).replace(/\/$/, "")
+const PLATFORM_URL = (
+	process.env.NEXT_PUBLIC_APP_URL || "https://dev.bilimai.kz"
+).replace(/\/$/, "")
 const WAITLIST_PROXY_ENDPOINT = "/api/waitlist"
 const WAITLIST_API_ENDPOINT =
 	process.env.NEXT_PUBLIC_WAITLIST_API_URL ||
@@ -130,11 +138,10 @@ function useStoredLanguage() {
 
 // Залогиненного на платформе юзера уводим туда сразу. sessionid — host-only
 // httpOnly кука api-хоста; апекс → api-поддомен same-site, браузер приложит
-// её к credentialed-запросу сам. Пустой env → проверка отключена (локальная
-// разработка: cross-site кука с localhost всё равно не поедет).
+// её к credentialed-запросу сам. С localhost проверка бесполезна, но и
+// безвредна: cross-site кука не поедет, придёт authenticated: false.
 function useSessionRedirect() {
 	useEffect(() => {
-		if (!APP_ORIGIN || !API_ORIGIN) return
 		const controller = new AbortController()
 		fetch(`${API_ORIGIN}/api/v1/auth/session/`, {
 			credentials: "include", // обязателен для cross-origin кук
@@ -144,7 +151,7 @@ function useSessionRedirect() {
 			.then((r) => (r.ok ? r.json() : null))
 			.then((data) => {
 				// "/" на платформе — HomeRoute: сам уводит на /dashboard|/marketplace
-				if (data?.authenticated) window.location.replace(appUrl("/"))
+				if (data?.authenticated) window.location.replace(`${PLATFORM_URL}/`)
 			})
 			.catch(() => {}) // API недоступен → просто показываем лендинг
 		return () => controller.abort()
