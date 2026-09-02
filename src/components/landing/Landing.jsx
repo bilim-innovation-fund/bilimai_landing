@@ -63,6 +63,7 @@ const combinedEventsCover = `${ASSET_ROOT}/marketplace-lessons/combined-events.j
 const graphingLinesCover = `${ASSET_ROOT}/marketplace-lessons/graphing-lines.jpg`
 
 const APP_ORIGIN = (process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "")
+const API_ORIGIN = (process.env.NEXT_PUBLIC_API_ORIGIN || "").replace(/\/$/, "")
 const WAITLIST_PROXY_ENDPOINT = "/api/waitlist"
 const WAITLIST_API_ENDPOINT =
 	process.env.NEXT_PUBLIC_WAITLIST_API_URL ||
@@ -125,6 +126,29 @@ function useStoredLanguage() {
 	}, [])
 
 	return language
+}
+
+// Залогиненного на платформе юзера уводим туда сразу. sessionid — host-only
+// httpOnly кука api-хоста; апекс → api-поддомен same-site, браузер приложит
+// её к credentialed-запросу сам. Пустой env → проверка отключена (локальная
+// разработка: cross-site кука с localhost всё равно не поедет).
+function useSessionRedirect() {
+	useEffect(() => {
+		if (!APP_ORIGIN || !API_ORIGIN) return
+		const controller = new AbortController()
+		fetch(`${API_ORIGIN}/api/v1/auth/session/`, {
+			credentials: "include", // обязателен для cross-origin кук
+			cache: "no-store",
+			signal: controller.signal,
+		})
+			.then((r) => (r.ok ? r.json() : null))
+			.then((data) => {
+				// "/" на платформе — HomeRoute: сам уводит на /dashboard|/marketplace
+				if (data?.authenticated) window.location.replace(appUrl("/"))
+			})
+			.catch(() => {}) // API недоступен → просто показываем лендинг
+		return () => controller.abort()
+	}, [])
 }
 
 const postWaitlistJson = (endpoint, data) =>
@@ -2216,6 +2240,7 @@ function useReveal() {
 }
 
 export default function App({ copyrightYear }) {
+	useSessionRedirect()
 	const [waitlistOpen, setWaitlistOpen] = useState(false)
 	const language = useStoredLanguage()
 	useReveal()
