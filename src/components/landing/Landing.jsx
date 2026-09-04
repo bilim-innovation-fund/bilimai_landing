@@ -64,13 +64,14 @@ const graphingLinesCover = `${ASSET_ROOT}/marketplace-lessons/graphing-lines.jpg
 
 const APP_ORIGIN = (process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "")
 // Env сервера лендинга нам недоступен, поэтому рабочие значения зашиты
-// фолбэками (как у WAITLIST_API_ENDPOINT ниже). При переключении апекса на
-// прод заменить на https://api.app.bilimai.kz / https://app.bilimai.kz.
+// фолбэками (как у WAITLIST_API_ENDPOINT ниже). Апекс — прод-сайт, поэтому
+// проверяем прод-сессию и уводим на прод-платформу; для дев-стенда задайте
+// NEXT_PUBLIC_API_ORIGIN / NEXT_PUBLIC_APP_URL — env перебивает фолбэк.
 const API_ORIGIN = (
-	process.env.NEXT_PUBLIC_API_ORIGIN || "https://api.dev.bilimai.kz"
+	process.env.NEXT_PUBLIC_API_ORIGIN || "https://api.app.bilimai.kz"
 ).replace(/\/$/, "")
 const PLATFORM_URL = (
-	process.env.NEXT_PUBLIC_APP_URL || "https://dev.bilimai.kz"
+	process.env.NEXT_PUBLIC_APP_URL || "https://app.bilimai.kz"
 ).replace(/\/$/, "")
 const WAITLIST_PROXY_ENDPOINT = "/api/waitlist"
 const WAITLIST_API_ENDPOINT =
