@@ -151,8 +151,11 @@ function useSessionRedirect() {
 		})
 			.then((r) => (r.ok ? r.json() : null))
 			.then((data) => {
-				// "/" на платформе — HomeRoute: сам уводит на /dashboard|/marketplace
-				if (data?.authenticated) window.location.replace(`${PLATFORM_URL}/`)
+				// Сразу на /dashboard, минуя HomeRoute на "/": одним редиректом
+				// меньше. Маршрут защищён ProtectedRoute, а для скрытого модуля
+				// home ModuleGateRoute покажет заглушку — без "/" не страдаем.
+				if (data?.authenticated)
+					window.location.replace(`${PLATFORM_URL}/dashboard`)
 			})
 			.catch(() => {}) // API недоступен → просто показываем лендинг
 		return () => controller.abort()
