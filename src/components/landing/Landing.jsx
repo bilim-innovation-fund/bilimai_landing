@@ -78,6 +78,9 @@ const WAITLIST_API_ENDPOINT =
 	process.env.NEXT_PUBLIC_WAITLIST_API_URL ||
 	"https://api.dev.bilimai.kz/api/v1/auth/waitlist/"
 const appUrl = (path) => `${APP_ORIGIN}${path}`
+// Через PLATFORM_URL, а не appUrl: у appUrl основание APP_ORIGIN, и без
+// NEXT_PUBLIC_APP_URL оно пустое — ссылка молча уехала бы на сам лендинг.
+const LOGIN_URL = `${PLATFORM_URL}/login`
 const WHATSAPP_NUMBER_ERROR =
 	"Введите номер в международном формате, например +7 700 000 00 00."
 const DEFAULT_LANGUAGE = "kk"
@@ -205,7 +208,7 @@ function Logo() {
 	)
 }
 
-function WaitlistButton({ onClick, className = "" }) {
+function WaitlistButton({ onClick, className = "", withArrow = true }) {
 	const { t } = useI18n()
 	return (
 		<button
@@ -214,7 +217,9 @@ function WaitlistButton({ onClick, className = "" }) {
 			onClick={onClick}
 		>
 			<span>{t("Получить ранний доступ")}</span>
-			<ArrowRight size={17} strokeWidth={2.2} aria-hidden='true' />
+			{withArrow ? (
+				<ArrowRight size={17} strokeWidth={2.2} aria-hidden='true' />
+			) : null}
 		</button>
 	)
 }
@@ -574,12 +579,111 @@ function WaitlistModal({ open, onClose }) {
 	)
 }
 
-function Navigation() {
-	const [open, setOpen] = useState(false)
+// Выбор языка своей разметкой, а не нативным <select>: тот открывался
+// системным списком ОС — прямые углы, синяя подсветка Windows, свой шрифт —
+// и посреди лендинга это выглядело чужеродно. Цена замены — то, что <select>
+// делал сам: закрытие по клику вне и по Escape, роли listbox/option и
+// стрелки вверх-вниз. Всё это ниже.
+function LanguageSwitcher({ onSelect }) {
 	const { language, setLanguage, t } = useI18n()
-	const currentLanguage =
+	const [open, setOpen] = useState(false)
+	const rootRef = useRef(null)
+	const menuRef = useRef(null)
+	const current =
 		LANGUAGE_OPTIONS.find((option) => option.code === language) ||
 		LANGUAGE_OPTIONS[0]
+
+	useEffect(() => {
+		if (!open) return undefined
+
+		const handlePointerDown = (event) => {
+			if (!rootRef.current?.contains(event.target)) setOpen(false)
+		}
+		const handleKeyDown = (event) => {
+			if (event.key === "Escape") {
+				setOpen(false)
+				// Фокус обратно на кнопку: иначе он остаётся на исчезнувшем
+				// пункте и следующий Tab начинает обход с начала страницы.
+				rootRef.current?.querySelector("button")?.focus()
+				return
+			}
+			if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return
+			const items = [
+				...(menuRef.current?.querySelectorAll("[role='option']") || []),
+			]
+			if (!items.length) return
+			event.preventDefault()
+			const at = items.indexOf(document.activeElement)
+			const step = event.key === "ArrowDown" ? 1 : -1
+			const next = at < 0 ? 0 : (at + step + items.length) % items.length
+			items[next].focus()
+		}
+
+		document.addEventListener("pointerdown", handlePointerDown)
+		document.addEventListener("keydown", handleKeyDown)
+		return () => {
+			document.removeEventListener("pointerdown", handlePointerDown)
+			document.removeEventListener("keydown", handleKeyDown)
+		}
+	}, [open])
+
+	const choose = (code) => {
+		setLanguage(code)
+		setOpen(false)
+		onSelect?.()
+	}
+
+	return (
+		<div className='language-switcher' ref={rootRef}>
+			{/* Текущий язык — частью названия кнопки: aria-label перекрывает
+			    её содержимое, и без него скринридер сказал бы «выбрать язык»,
+			    не сказав, какой выбран сейчас. */}
+			<button
+				className='language-switcher__trigger'
+				type='button'
+				aria-haspopup='listbox'
+				aria-expanded={open}
+				aria-label={`${t("Выбрать язык")}: ${current.label}`}
+				onClick={() => setOpen((value) => !value)}
+			>
+				<Languages size={17} aria-hidden='true' />
+				<span className='language-switcher__value'>{current.short}</span>
+				<ChevronDown
+					className='language-switcher__caret'
+					size={14}
+					aria-hidden='true'
+				/>
+			</button>
+			{open ? (
+				<div
+					className='language-switcher__menu'
+					ref={menuRef}
+					role='listbox'
+					aria-label={t("Выбрать язык")}
+				>
+					{LANGUAGE_OPTIONS.map((option) => (
+						<button
+							className='language-switcher__option'
+							key={option.code}
+							type='button'
+							role='option'
+							aria-selected={option.code === language}
+							onClick={() => choose(option.code)}
+						>
+							<span>{option.label}</span>
+							<i>{option.short}</i>
+							<Check size={15} aria-hidden='true' />
+						</button>
+					))}
+				</div>
+			) : null}
+		</div>
+	)
+}
+
+function Navigation() {
+	const [open, setOpen] = useState(false)
+	const { t } = useI18n()
 
 	useEffect(() => {
 		const close = () => setOpen(false)
@@ -615,31 +719,14 @@ function Navigation() {
 					</a>
 				</div>
 				<div className='nav-actions'>
-					<label className='language-switcher'>
-						<Languages size={17} aria-hidden='true' />
-						<span className='sr-only'>{t("Выбрать язык")}</span>
-						<span
-							className='language-switcher__value'
-							aria-hidden='true'
-						>
-							{currentLanguage.short}
-						</span>
-						<select
-							value={language}
-							onChange={(event) => {
-								setLanguage(event.target.value)
-								setOpen(false)
-							}}
-							aria-label={t("Выбрать язык")}
-						>
-							{LANGUAGE_OPTIONS.map((option) => (
-								<option value={option.code} key={option.code}>
-									{option.short}
-								</option>
-							))}
-						</select>
-						<ChevronDown size={14} aria-hidden='true' />
-					</label>
+					<a
+						className='nav-login'
+						href={LOGIN_URL}
+						onClick={() => setOpen(false)}
+					>
+						{t("Войти")}
+					</a>
+					<LanguageSwitcher onSelect={() => setOpen(false)} />
 				</div>
 			</div>
 		</nav>
@@ -1185,18 +1272,34 @@ function Hero({ onWaitlistOpen }) {
 							"Планируйте по программе, создавайте уроки и тесты вместе с ИИ, ведите классы — Bilim AI связывает весь учебный процесс в одном месте",
 						)}
 					</p>
+					{/* Одно главное действие, одно запасное и одна ссылка.
+					    Раньше здесь стояли две зелёные заливки подряд, обе про
+					    «начать пользоваться», и жать было непонятно куда; а якорь
+					    на секцию ниже — это прокрутка, а не переход, и кнопкой он
+					    притворялся зря. */}
 					<div className='hero-copy__actions'>
-						<WaitlistButton
-							className='button--primary'
-							onClick={onWaitlistOpen}
-						/>
-						<a
-							className='button button--hero-secondary'
-							href='#product'
-						>
-							{t("Посмотреть возможности")}
+						<a className='button button--primary' href={LOGIN_URL}>
+							{t("Начать")}
+							<ArrowRight
+								size={17}
+								strokeWidth={2.2}
+								aria-hidden='true'
+							/>
 						</a>
+						<WaitlistButton
+							className='button--hero-secondary'
+							onClick={onWaitlistOpen}
+							withArrow={false}
+						/>
 					</div>
+					<a className='hero-copy__more' href='#product'>
+						{t("Посмотреть возможности")}
+						<ChevronDown
+							size={15}
+							strokeWidth={2.4}
+							aria-hidden='true'
+						/>
+					</a>
 				</div>
 			</div>
 		</header>

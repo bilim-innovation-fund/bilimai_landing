@@ -182,6 +182,11 @@ svg {
 .language-switcher {
   position: relative;
   display: inline-flex;
+}
+
+.language-switcher__trigger {
+  display: inline-flex;
+  width: 100%;
   min-height: 38px;
   align-items: center;
   gap: 7px;
@@ -189,26 +194,18 @@ svg {
   border: 1px solid rgba(28, 30, 29, 0.12);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.68);
+  color: inherit;
+  font: inherit;
   cursor: pointer;
-  transition: border-color 180ms ease, background 180ms ease;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease;
 }
 
-.language-switcher:hover {
+.language-switcher__trigger:hover,
+.language-switcher__trigger[aria-expanded="true"] {
   border-color: rgba(0, 117, 43, 0.3);
   background: white;
-}
-
-.language-switcher select {
-  position: absolute;
-  z-index: 2;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  outline: none;
-  appearance: none;
-  opacity: 0;
-  cursor: pointer;
 }
 
 .language-switcher__value {
@@ -218,8 +215,96 @@ svg {
   text-align: center;
 }
 
-.language-switcher > svg {
+.language-switcher__caret {
+  transition: transform 180ms ease;
+}
+
+.language-switcher__trigger[aria-expanded="true"] .language-switcher__caret {
+  transform: rotate(180deg);
+}
+
+.language-switcher__trigger svg {
   pointer-events: none;
+}
+
+.language-switcher__menu {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 8px);
+  right: 0;
+  display: flex;
+  min-width: 190px;
+  flex-direction: column;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 18px 44px -22px rgba(28, 30, 29, 0.42);
+  animation: language-menu-in 140ms ease;
+}
+
+@keyframes language-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.language-switcher__option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 560;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    color 140ms ease;
+}
+
+.language-switcher__option:hover,
+.language-switcher__option:focus-visible {
+  background: var(--paper);
+  outline: none;
+}
+
+.language-switcher__option > span {
+  flex: 1;
+}
+
+/* Короткий код — тот же, что на кнопке: он объясняет, во что превратится
+   выбор, и заодно держит ширину строки постоянной. */
+.language-switcher__option > i {
+  color: var(--muted);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 720;
+  letter-spacing: 0.02em;
+}
+
+/* Галочка есть у каждой строки, но видна у выбранной: так строки не
+   дёргаются по ширине при переключении. */
+.language-switcher__option > svg {
+  color: var(--brand-green);
+  opacity: 0;
+}
+
+.language-switcher__option[aria-selected="true"] {
+  color: var(--brand-green);
+}
+
+.language-switcher__option[aria-selected="true"] > i {
+  color: var(--brand-green);
+}
+
+.language-switcher__option[aria-selected="true"] > svg {
+  opacity: 1;
 }
 
 .sr-only {
@@ -581,6 +666,32 @@ svg {
   justify-content: center;
   gap: 10px;
   margin-top: 31px;
+}
+
+/* Якорь на секцию ниже: это прокрутка, а не переход, поэтому ссылка со
+   стрелкой вниз, а не третья кнопка. Центрируется за счёт text-align
+   родительского .hero-copy. */
+.hero-copy__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 560;
+  transition: color 180ms ease;
+}
+
+.hero-copy__more:hover {
+  color: var(--ink);
+}
+
+.hero-copy__more svg {
+  transition: transform 180ms ease;
+}
+
+.hero-copy__more:hover svg {
+  transform: translateY(2px);
 }
 
 @media (min-width: 1181px) {
@@ -4884,8 +4995,16 @@ svg {
 
   .language-switcher {
     width: 100%;
-    justify-content: center;
     margin-top: 10px;
+  }
+
+  .language-switcher__trigger {
+    justify-content: center;
+  }
+
+  .language-switcher__menu {
+    left: 0;
+    min-width: 0;
   }
 
   .nav-actions .button {
