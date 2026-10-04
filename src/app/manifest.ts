@@ -1,20 +1,22 @@
 import type { MetadataRoute } from "next";
+import { DEFAULT_LOCALE } from "@/i18n/config";
+import { getMeta } from "@/i18n/dictionaries";
+import { SITE } from "@/lib/site";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "Bilim AI",
-    short_name: "Bilim AI",
-    description:
-      "ҚМЖ, ОМЖ, КТЖ жоспарлары, сабақтар мен слайдтар, БЖБ/ТЖБ тесттері және қағаз жұмыстарын фото арқылы тексеру — Bilim AI, Қазақстан мұғалімдеріне арналған ЖИ.",
-    lang: "kk",
+    name: SITE.brand,
+    short_name: SITE.brand,
+    description: getMeta(DEFAULT_LOCALE).description,
+    lang: DEFAULT_LOCALE,
     dir: "ltr",
     // Корень, а не /kk: он редиректит на язык из cookie или браузера.
     start_url: "/",
     scope: "/",
     display: "browser",
-    background_color: "#f5f6f4",
-    theme_color: "#f5f6f4",
+    background_color: SITE.themeColor,
+    theme_color: SITE.themeColor,
     categories: ["education", "productivity"],
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },

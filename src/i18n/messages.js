@@ -1,9 +1,6 @@
-export const LANGUAGE_OPTIONS = [
-	{ code: "kk", short: "ҚАЗ", label: "Қазақша" },
-	{ code: "ru", short: "RU", label: "Русский" },
-	{ code: "en", short: "EN", label: "English" },
-]
-
+// Словари лендинга. Ключ — исходная русская строка; без перевода
+// показывается сам ключ. Язык задаёт URL (/kk, /ru, /en), в браузер уходит
+// только словарь текущего языка.
 const kk = {
 	"Bilim AI — на главную": "Bilim AI — басты бетке өту",
 	"Основная навигация": "Негізгі навигация",
@@ -186,6 +183,8 @@ const kk = {
 	"Платформа уже доступна?": "Платформа қазір қолжетімді ме?",
 	"BilimAI сейчас в разработке и скоро будет запущена.":
 		"BilimAI қазір әзірленіп жатыр және жақын арада іске қосылады.",
+	"Bilim AI — это ИИ-платформа для учителей Казахстана, которая объединяет планирование по обновлённой программе, создание уроков и тестов и аналитику класса. Она помогает готовить ҰМЖ, ОМЖ, КТЖ и ҚМЖ (ДСП, ССП, КТП, КСП), уроки и презентации, БЖБ и ТЖБ (СОР и СОЧ) на казахском, русском и английском, проверять работы по фото и видеть результаты каждого ученика в одном пространстве.":
+		"Bilim AI — Қазақстан мұғалімдеріне арналған ЖИ платформасы: жаңартылған бағдарлама бойынша жоспарлауды, сабақ пен тест құруды және сынып аналитикасын бір жерге біріктіреді. Ол ҰМЖ, ОМЖ, КТЖ және ҚМЖ, сабақтар мен презентациялар, БЖБ мен ТЖБ дайындауға, жұмыстарды фото арқылы тексеруге және әр оқушының нәтижесін бір кеңістікте көруге көмектеседі — қазақ, орыс және ағылшын тілдерінде.",
 
 	"Весь учебный процесс — в одном пространстве": "Бүкіл оқу үдерісі — бір кеңістікте",
 	"Сделайте каждый урок сильнее": "Әр сабағыңызды тиімдірек етіңіз",
@@ -422,6 +421,8 @@ const en = {
 	"Платформа уже доступна?": "Is the platform available yet?",
 	"BilimAI сейчас в разработке и скоро будет запущена.":
 		"BilimAI is currently in development and will launch soon.",
+	"Bilim AI — это ИИ-платформа для учителей Казахстана, которая объединяет планирование по обновлённой программе, создание уроков и тестов и аналитику класса. Она помогает готовить ҰМЖ, ОМЖ, КТЖ и ҚМЖ (ДСП, ССП, КТП, КСП), уроки и презентации, БЖБ и ТЖБ (СОР и СОЧ) на казахском, русском и английском, проверять работы по фото и видеть результаты каждого ученика в одном пространстве.":
+		"Bilim AI is an AI platform for teachers in Kazakhstan that brings curriculum-aligned planning, lesson and test creation, and class analytics into one workspace. It helps prepare long-, medium-, calendar- and short-term plans (ҰМЖ, ОМЖ, КТЖ, ҚМЖ), lessons and presentations, and unit and term summative assessments (БЖБ/ТЖБ, СОР/СОЧ) in Kazakh, Russian and English, grade paper work from photos, and see every student's results in one place.",
 
 	"Весь учебный процесс — в одном пространстве": "The entire learning process in one connected space",
 	"Сделайте каждый урок сильнее": "Make every lesson stronger",
@@ -459,13 +460,4 @@ const en = {
 	"Diversity of Animals": "Diversity of Animals",
 }
 
-const translations = { kk, ru, en }
-
-export function translate(language, source, variables = {}) {
-	const template = translations[language]?.[source] || source
-	return Object.entries(variables).reduce(
-		(result, [key, value]) =>
-			result.replaceAll(`{{${key}}}`, String(value)),
-		template,
-	)
-}
+export { kk, ru, en }

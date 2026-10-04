@@ -246,6 +246,12 @@ body.js [data-reveal]:not(.is-visible) {
   animation: language-menu-in 140ms ease;
 }
 
+/* Меню всегда в разметке (ссылки на языки видны краулерам), закрытое — с
+   hidden. display: flex выше перебивает UA-стиль [hidden], поэтому явно. */
+.language-switcher__menu[hidden] {
+  display: none;
+}
+
 @keyframes language-menu-in {
   from {
     opacity: 0;
@@ -298,15 +304,15 @@ body.js [data-reveal]:not(.is-visible) {
   opacity: 0;
 }
 
-.language-switcher__option[aria-selected="true"] {
+.language-switcher__option[aria-current="page"] {
   color: var(--brand-green);
 }
 
-.language-switcher__option[aria-selected="true"] > i {
+.language-switcher__option[aria-current="page"] > i {
   color: var(--brand-green);
 }
 
-.language-switcher__option[aria-selected="true"] > svg {
+.language-switcher__option[aria-current="page"] > svg {
   opacity: 1;
 }
 
@@ -8562,4 +8568,47 @@ body.js [data-reveal]:not(.is-visible) {
   .marketplace-ribbon__group[aria-hidden="true"] {
     display: none;
   }
+}
+
+/* Глобальная 404 (src/app/global-not-found.tsx): один экран, три языка. */
+.not-found {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+  gap: 22px;
+  padding-block: 64px;
+}
+
+.not-found__code {
+  margin: 12px 0 0;
+  color: var(--brand-green);
+  font-size: 14px;
+  font-weight: 720;
+  letter-spacing: 0.08em;
+}
+
+.not-found__message h1,
+.not-found__message h2 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.not-found__message h2 {
+  color: var(--muted);
+  font-size: clamp(22px, 3vw, 32px);
+}
+
+.not-found__message p {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.not-found__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
 }

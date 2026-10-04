@@ -4,6 +4,8 @@ import {
 	createContext,
 	useContext,
 	useEffect,
+	useId,
+	useMemo,
 	useRef,
 	useState,
 } from "react"
@@ -39,7 +41,9 @@ import {
 	Users,
 	X,
 } from "lucide-react"
-import { LANGUAGE_OPTIONS, translate } from "./i18n"
+import { FAQ_ITEMS } from "@/content/landing"
+import { LANGUAGE_OPTIONS, LOCALE_COOKIE } from "@/i18n/config"
+import { createTranslator } from "@/i18n/translate"
 
 const ASSET_ROOT = "/images/landing"
 const bilimLogo = `${ASSET_ROOT}/new-bilimai-logo.svg`
@@ -80,62 +84,6 @@ const appUrl = (path) => `${PLATFORM_URL}${path}`
 const LOGIN_URL = `${PLATFORM_URL}/login`
 const WHATSAPP_NUMBER_ERROR =
 	"Введите номер в международном формате, например +7 700 000 00 00."
-const DEFAULT_LANGUAGE = "kk"
-const LANGUAGE_STORAGE_KEY = "bilim-landing-language"
-const LANGUAGE_CHANGE_EVENT = "bilim-landing-language-change"
-const supportedLanguages = new Set(
-	LANGUAGE_OPTIONS.map((option) => option.code),
-)
-let inMemoryLanguage = DEFAULT_LANGUAGE
-
-const getLanguageSnapshot = () => {
-	try {
-		const storedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
-		return supportedLanguages.has(storedLanguage)
-			? storedLanguage
-			: inMemoryLanguage
-	} catch {
-		return inMemoryLanguage
-	}
-}
-
-const subscribeToLanguage = (onLanguageChange) => {
-	const handleStorage = (event) => {
-		if (event.key === LANGUAGE_STORAGE_KEY) onLanguageChange()
-	}
-
-	window.addEventListener("storage", handleStorage)
-	window.addEventListener(LANGUAGE_CHANGE_EVENT, onLanguageChange)
-
-	return () => {
-		window.removeEventListener("storage", handleStorage)
-		window.removeEventListener(LANGUAGE_CHANGE_EVENT, onLanguageChange)
-	}
-}
-
-const setStoredLanguage = (language) => {
-	if (!supportedLanguages.has(language)) return
-	inMemoryLanguage = language
-	try {
-		window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
-	} catch {
-		// The switcher still works when browser storage is unavailable.
-	}
-	window.dispatchEvent(new Event(LANGUAGE_CHANGE_EVENT))
-}
-
-function useStoredLanguage() {
-	const [language, setLanguage] = useState(DEFAULT_LANGUAGE)
-
-	useEffect(() => {
-		const syncLanguage = () => setLanguage(getLanguageSnapshot())
-		const unsubscribe = subscribeToLanguage(syncLanguage)
-		syncLanguage()
-		return unsubscribe
-	}, [])
-
-	return language
-}
 
 // Залогиненного на платформе юзера уводим туда сразу. sessionid — host-only
 // httpOnly кука api-хоста; апекс → api-поддомен same-site, браузер приложит
@@ -576,16 +524,28 @@ function WaitlistModal({ open, onClose }) {
 	)
 }
 
+// Явный выбор языка запоминаем в cookie: по ней корень "/" редиректит на
+// нужную версию (next.config.ts). Простой просмотр страницы её не пишет.
+const rememberLanguage = (code) => {
+	const secure = window.location.protocol === "https:" ? "; Secure" : ""
+	document.cookie = `${LOCALE_COOKIE}=${code}; Path=/; Max-Age=31536000; SameSite=Lax${secure}`
+}
+
 // Выбор языка своей разметкой, а не нативным <select>: тот открывался
 // системным списком ОС — прямые углы, синяя подсветка Windows, свой шрифт —
 // и посреди лендинга это выглядело чужеродно. Цена замены — то, что <select>
-// делал сам: закрытие по клику вне и по Escape, роли listbox/option и
-// стрелки вверх-вниз. Всё это ниже.
-function LanguageSwitcher({ onSelect }) {
-	const { language, setLanguage, t } = useI18n()
+// делал сам: закрытие по клику вне и по Escape и стрелки вверх-вниз. Всё
+// это ниже.
+//
+// Пункты — обычные ссылки на /kk, /ru, /en (полная загрузка документа
+// обновляет <html lang> и метаданные). Меню всегда в разметке, закрытое —
+// с hidden: так ссылки на языковые версии видны краулерам в SSR-HTML.
+function LanguageSwitcher() {
+	const { language, t } = useI18n()
 	const [open, setOpen] = useState(false)
 	const rootRef = useRef(null)
 	const menuRef = useRef(null)
+	const menuId = useId()
 	const current =
 		LANGUAGE_OPTIONS.find((option) => option.code === language) ||
 		LANGUAGE_OPTIONS[0]
@@ -605,9 +565,7 @@ function LanguageSwitcher({ onSelect }) {
 				return
 			}
 			if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return
-			const items = [
-				...(menuRef.current?.querySelectorAll("[role='option']") || []),
-			]
+			const items = [...(menuRef.current?.querySelectorAll("a[href]") || [])]
 			if (!items.length) return
 			event.preventDefault()
 			const at = items.indexOf(document.activeElement)
@@ -624,12 +582,6 @@ function LanguageSwitcher({ onSelect }) {
 		}
 	}, [open])
 
-	const choose = (code) => {
-		setLanguage(code)
-		setOpen(false)
-		onSelect?.()
-	}
-
 	return (
 		<div className='language-switcher' ref={rootRef}>
 			{/* Текущий язык — частью названия кнопки: aria-label перекрывает
@@ -638,8 +590,9 @@ function LanguageSwitcher({ onSelect }) {
 			<button
 				className='language-switcher__trigger'
 				type='button'
-				aria-haspopup='listbox'
+				aria-haspopup='true'
 				aria-expanded={open}
+				aria-controls={menuId}
 				aria-label={`${t("Выбрать язык")}: ${current.label}`}
 				onClick={() => setOpen((value) => !value)}
 			>
@@ -651,29 +604,28 @@ function LanguageSwitcher({ onSelect }) {
 					aria-hidden='true'
 				/>
 			</button>
-			{open ? (
-				<div
-					className='language-switcher__menu'
-					ref={menuRef}
-					role='listbox'
-					aria-label={t("Выбрать язык")}
-				>
-					{LANGUAGE_OPTIONS.map((option) => (
-						<button
-							className='language-switcher__option'
-							key={option.code}
-							type='button'
-							role='option'
-							aria-selected={option.code === language}
-							onClick={() => choose(option.code)}
-						>
-							<span>{option.label}</span>
-							<i>{option.short}</i>
-							<Check size={15} aria-hidden='true' />
-						</button>
-					))}
-				</div>
-			) : null}
+			<div
+				className='language-switcher__menu'
+				id={menuId}
+				ref={menuRef}
+				hidden={!open}
+			>
+				{LANGUAGE_OPTIONS.map((option) => (
+					<a
+						className='language-switcher__option'
+						key={option.code}
+						href={`/${option.code}`}
+						hrefLang={option.code}
+						lang={option.code}
+						aria-current={option.code === language ? "page" : undefined}
+						onClick={() => rememberLanguage(option.code)}
+					>
+						<span>{option.label}</span>
+						<i>{option.short}</i>
+						<Check size={15} aria-hidden='true' />
+					</a>
+				))}
+			</div>
 		</div>
 	)
 }
@@ -723,7 +675,7 @@ function Navigation() {
 					>
 						{t("Войти")}
 					</a>
-					<LanguageSwitcher onSelect={() => setOpen(false)} />
+					<LanguageSwitcher />
 				</div>
 			</div>
 		</nav>
@@ -2007,33 +1959,6 @@ function SecondaryFeatures() {
 	return <PersonaSection />
 }
 
-const FAQ_ITEMS = [
-	[
-		"Что такое BilimAI?",
-		"BilimAI — это платформа на базе ИИ, которая помогает создавать структурированные уроки по любой теме и даёт ученикам умные инструменты для обучения.",
-	],
-	[
-		"BilimAI заменяет учителей?",
-		"Нет. BilimAI сокращает время на подготовку, чтобы учителя могли сосредоточиться на главном — преподавании и работе с учениками.",
-	],
-	[
-		"Можно ли создавать уроки вне учебной программы?",
-		"Да. Учителя могут создавать уроки как по темам официальной программы, так и по любым своим темам.",
-	],
-	[
-		"Что входит в урок, созданный ИИ?",
-		"Каждый урок включает объяснения, примеры, упражнения и задания для проверки знаний — всё в чёткой и последовательной структуре.",
-	],
-	[
-		"Могут ли учителя делиться уроками?",
-		"Да. В BilimAI есть маркетплейс, где учителя могут делиться уроками, находить материалы других авторов и адаптировать их под свои нужды.",
-	],
-	[
-		"Платформа уже доступна?",
-		"BilimAI сейчас в разработке и скоро будет запущена.",
-	],
-]
-
 function FAQ() {
 	const { t } = useI18n()
 	return (
@@ -2302,7 +2227,7 @@ function FinalCta({ onWaitlistOpen }) {
 	)
 }
 
-function Footer({ copyrightYear }) {
+function Footer() {
 	const { t } = useI18n()
 	return (
 		<footer className='footer section-pad'>
@@ -2323,7 +2248,7 @@ function Footer({ copyrightYear }) {
 				</div>
 			</div>
 			<div className='footer__bottom'>
-				<span>© {copyrightYear} Bilim AI</span>
+				<span>© 2026 Bilim AI</span>
 			</div>
 		</footer>
 	)
@@ -2355,27 +2280,17 @@ function useReveal() {
 	}, [])
 }
 
-export default function App({ copyrightYear }) {
+// Язык приходит из URL (/kk, /ru, /en), словарь — только текущего языка
+// (src/app/[lang]/page.tsx). Пропсы описаны в Landing.d.ts.
+export default function App({ lang, messages }) {
 	useSessionRedirect()
 	const [waitlistOpen, setWaitlistOpen] = useState(false)
-	const language = useStoredLanguage()
 	useReveal()
 
-	useEffect(() => {
-		document.documentElement.lang = language
-		document.title =
-			language === "kk"
-				? "Bilim AI — сабақтар, тесттер және сыныптар бір кеңістікте"
-				: language === "en"
-					? "Bilim AI — lessons, tests, and classes in one space"
-					: "Bilim AI — уроки, тесты и классы в одном пространстве"
-	}, [language])
-
-	const i18n = {
-		language,
-		setLanguage: setStoredLanguage,
-		t: (source, variables) => translate(language, source, variables),
-	}
+	const i18n = useMemo(
+		() => ({ language: lang, t: createTranslator(messages) }),
+		[lang, messages],
+	)
 
 	return (
 		<LanguageContext.Provider value={i18n}>
@@ -2387,7 +2302,7 @@ export default function App({ copyrightYear }) {
 				<FAQ />
 				<FinalCta onWaitlistOpen={() => setWaitlistOpen(true)} />
 			</main>
-			<Footer copyrightYear={copyrightYear} />
+			<Footer />
 			{waitlistOpen ? (
 				<WaitlistModal open onClose={() => setWaitlistOpen(false)} />
 			) : null}
