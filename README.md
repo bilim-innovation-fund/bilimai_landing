@@ -1,30 +1,33 @@
 # Bilim AI Landing
 
-Маркетинговый лендинг Bilim AI на Next.js.
+Маркетинговый сайт https://bilimai.kz на Next.js 16 (App Router, Turbopack): лендинг на казахском, русском и английском (`/kk`, `/ru`, `/en`) и блог для учителей (`/ru/blog`, `/kk/blog`). Деплой — Vercel по push в `main`.
 
-## Development
+## Разработка
 
-```bash
-pnpm install
-pnpm dev
-```
-
-Приложение откроется на `http://localhost:3000`.
-
-## Настройка окружения
-
-Скопируйте `.env.example` в `.env.local`. Основные параметры:
-
-- `NEXT_PUBLIC_APP_URL` — адрес основного приложения для ссылок на материалы;
-- `NEXT_PUBLIC_WAITLIST_API_URL` — публичный endpoint списка ожидания из Swagger;
-- `API_PROXY_TARGET` — сервер BilimAI API;
-- `WAITLIST_API_URL` — необязательный полный адрес endpoint списка ожидания.
-
-Форма сначала обращается к BilimAI API напрямую, а при ограничениях CORS использует серверный маршрут `/api/waitlist`. Если серверный процесс не может установить исходящее соединение, используется поддерживаемый API запрос `application/x-www-form-urlencoded`, не требующий CORS-префлайта.
-
-## Production
+`pnpm` ставится через corepack. Lockfile собран pnpm 10 (`lockfileVersion 9.0`, им же собирает Vercel), поэтому версия указывается явно:
 
 ```bash
-pnpm build
-pnpm start
+corepack pnpm@10.34.6 install
+corepack pnpm@10.34.6 dev
 ```
+
+Сайт откроется на `http://localhost:3000` и редиректнет на `/kk`, `/ru` или `/en` по языку браузера.
+
+Сборка и проверки:
+
+```bash
+corepack pnpm@10.34.6 build        # заодно валидирует посты блога
+corepack pnpm@10.34.6 start
+corepack pnpm@10.34.6 lint
+corepack pnpm@10.34.6 exec tsc --noEmit
+```
+
+## Окружение
+
+Доступа к env-переменным Vercel у команды нет, поэтому продовые адреса зашиты в код (`https://bilimai.kz`, `https://app.bilimai.kz`, `https://api.app.bilimai.kz` — `src/lib/site.ts` и фолбэки в `src/components/landing/Landing.jsx`). `.env.local` нужен только для dev-стенда (см. `.env.example`): переменные `NEXT_PUBLIC_*` перебивают прод-фолбэки. Прод-сборку с ними не делайте.
+
+## Документация
+
+- [docs/ru/README.md](docs/ru/README.md) — индекс.
+- [docs/ru/SEO.md](docs/ru/SEO.md) — языки, метаданные, JSON-LD, OG-картинки, robots/sitemap/llms.txt, чек-лист проверки.
+- [docs/ru/BLOG.md](docs/ru/BLOG.md) — как публиковать посты из бэкенда, формат файлов и валидатор.
