@@ -41,30 +41,31 @@ import {
 	Users,
 	X,
 } from "lucide-react"
+import NextImage from "next/image"
+import bifPartnerLogo from "@/assets/landing/partners/bif.png"
+import bilPartnerLogo from "@/assets/landing/partners/bil.png"
+import nurordaPartnerLogo from "@/assets/landing/partners/nurorda-logo.png"
+import sdlPartnerLogo from "@/assets/landing/partners/sdl.png"
+import sduPartnerLogo from "@/assets/landing/partners/sdu.png"
+import spectrumPartnerLogo from "@/assets/landing/partners/spectrum.png"
+import mitosisCover from "@/assets/landing/covers/mitosis.jpg"
+import parallaxCover from "@/assets/landing/covers/parallax.jpg"
+import lcOscillationsCover from "@/assets/landing/covers/lc-oscillations.jpg"
+import photosynthesisCover from "@/assets/landing/covers/photosynthesis.jpg"
+import diversityAnimalsCover from "@/assets/landing/covers/diversity-animals.jpg"
+import chemicalKineticsCover from "@/assets/landing/covers/chemical-kinetics.jpg"
+import carbonSiliconCover from "@/assets/landing/covers/carbon-silicon.jpg"
+import kazakhstanWwiiCover from "@/assets/landing/covers/kazakhstan-wwii.jpg"
+import independenceKazakhstanCover from "@/assets/landing/covers/independence-kazakhstan.jpg"
+import geometricSequencesCover from "@/assets/landing/covers/geometric-sequences.jpg"
+import combinedEventsCover from "@/assets/landing/covers/combined-events.jpg"
+import graphingLinesCover from "@/assets/landing/covers/graphing-lines.jpg"
 import { FAQ_ITEMS } from "@/content/landing"
 import { LANGUAGE_OPTIONS, LOCALE_COOKIE } from "@/i18n/config"
 import { createTranslator } from "@/i18n/translate"
 
 const ASSET_ROOT = "/images/landing"
 const bilimLogo = `${ASSET_ROOT}/new-bilimai-logo.svg`
-const bifPartnerLogo = `${ASSET_ROOT}/partners/bif.png`
-const bilPartnerLogo = `${ASSET_ROOT}/partners/bil.png`
-const nurordaPartnerLogo = `${ASSET_ROOT}/partners/nurorda-logo.png`
-const sdlPartnerLogo = `${ASSET_ROOT}/partners/sdl.png`
-const sduPartnerLogo = `${ASSET_ROOT}/partners/sdu.png`
-const spectrumPartnerLogo = `${ASSET_ROOT}/partners/spectrum.png`
-const mitosisCover = `${ASSET_ROOT}/marketplace-lessons/mitosis.jpg`
-const parallaxCover = `${ASSET_ROOT}/marketplace-lessons/parallax.jpg`
-const lcOscillationsCover = `${ASSET_ROOT}/marketplace-lessons/lc-oscillations.jpg`
-const photosynthesisCover = `${ASSET_ROOT}/marketplace-lessons/photosynthesis.jpg`
-const diversityAnimalsCover = `${ASSET_ROOT}/marketplace-lessons/diversity-animals.jpg`
-const chemicalKineticsCover = `${ASSET_ROOT}/marketplace-lessons/chemical-kinetics.jpg`
-const carbonSiliconCover = `${ASSET_ROOT}/marketplace-lessons/carbon-silicon.jpg`
-const kazakhstanWwiiCover = `${ASSET_ROOT}/marketplace-lessons/kazakhstan-wwii.jpg`
-const independenceKazakhstanCover = `${ASSET_ROOT}/marketplace-lessons/independence-kazakhstan.jpg`
-const geometricSequencesCover = `${ASSET_ROOT}/marketplace-lessons/geometric-sequences.jpg`
-const combinedEventsCover = `${ASSET_ROOT}/marketplace-lessons/combined-events.jpg`
-const graphingLinesCover = `${ASSET_ROOT}/marketplace-lessons/graphing-lines.jpg`
 
 // Env сервера лендинга нам недоступен, поэтому рабочие значения зашиты
 // фолбэками (как у WAITLIST_API_ENDPOINT ниже). Апекс — прод-сайт, поэтому
@@ -1064,7 +1065,7 @@ function MiniBrowser({
 function FloatingCombinedEventsLesson() {
 	return (
 		<div className='float-card float-card--lesson hero-marketplace-card'>
-			<MarketplaceLessonCard lesson={MARKETPLACE_LESSONS[6]} />
+			<MarketplaceLessonCard lesson={MARKETPLACE_LESSONS[6]} eager />
 		</div>
 	)
 }
@@ -1098,7 +1099,7 @@ function FloatingPlan() {
 function FloatingChemistryLesson() {
 	return (
 		<div className='float-card float-card--class hero-marketplace-card'>
-			<MarketplaceLessonCard lesson={MARKETPLACE_LESSONS[8]} />
+			<MarketplaceLessonCard lesson={MARKETPLACE_LESSONS[8]} eager />
 		</div>
 	)
 }
@@ -1283,9 +1284,11 @@ function PartnerGroup({ duplicate = false }) {
 					role={duplicate ? undefined : "listitem"}
 					key={partner.name}
 				>
-					<img
+					<NextImage
 						src={partner.logo}
 						alt={duplicate ? "" : partner.name}
+						sizes='220px'
+						loading='lazy'
 					/>
 				</div>
 			))}
@@ -2122,7 +2125,20 @@ const MARKETPLACE_LESSONS = [
 // Уроки в MARKETPLACE_LESSONS взяты из dev-базы и на проде не существуют,
 // поэтому по умолчанию карточки декоративные. Ссылки вернёт linked, когда
 // карточки перепривяжут к прод-урокам по UUID.
-function MarketplaceLessonCard({ lesson, duplicate = false, linked = false }) {
+// sizes — измеренная ширина картинки: в split она занимает 43 % карточки
+// (до 142 px, в hero до 126 px), в cover — всю карточку (до 330 px).
+// eager только у двух hero-карточек первого экрана: это кандидаты в LCP.
+function lessonImageSizes(lesson, eager) {
+	if (eager) return "126px"
+	return lesson.layout === "split" ? "142px" : "330px"
+}
+
+function MarketplaceLessonCard({
+	lesson,
+	duplicate = false,
+	linked = false,
+	eager = false,
+}) {
 	const { t } = useI18n()
 	const Card = linked ? "a" : "div"
 	const translatedTitle = t(lesson.title)
@@ -2140,7 +2156,13 @@ function MarketplaceLessonCard({ lesson, duplicate = false, linked = false }) {
 			tabIndex={linked && duplicate ? -1 : undefined}
 		>
 			<div className='marketplace-lesson-card__preview'>
-				<img src={lesson.image} alt='' loading='lazy' />
+				<NextImage
+					src={lesson.image}
+					alt=''
+					sizes={lessonImageSizes(lesson, eager)}
+					loading={eager ? "eager" : "lazy"}
+					fetchPriority={eager ? "high" : undefined}
+				/>
 				<div className='marketplace-lesson-card__shade' />
 				<div className='marketplace-lesson-card__copy'>
 					<small>{t(lesson.subject)}</small>
