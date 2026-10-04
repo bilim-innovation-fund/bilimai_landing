@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+User-agent: Bytespider
+Disallow: /
+
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term /
+Sitemap: https://bilimai.kz/sitemap.xml
+# LLM: https://bilimai.kz/llms.txt

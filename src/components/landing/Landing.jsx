@@ -4,6 +4,8 @@ import {
 	createContext,
 	useContext,
 	useEffect,
+	useId,
+	useMemo,
 	useRef,
 	useState,
 } from "react"
@@ -39,30 +41,37 @@ import {
 	Users,
 	X,
 } from "lucide-react"
-import { LANGUAGE_OPTIONS, translate } from "./i18n"
+import NextImage from "next/image"
+import bifPartnerLogo from "@/assets/landing/partners/bif.png"
+import bilPartnerLogo from "@/assets/landing/partners/bil.png"
+import nurordaPartnerLogo from "@/assets/landing/partners/nurorda-logo.png"
+import sdlPartnerLogo from "@/assets/landing/partners/sdl.png"
+import sduPartnerLogo from "@/assets/landing/partners/sdu.png"
+import spectrumPartnerLogo from "@/assets/landing/partners/spectrum.png"
+import mitosisCover from "@/assets/landing/covers/mitosis.jpg"
+import parallaxCover from "@/assets/landing/covers/parallax.jpg"
+import lcOscillationsCover from "@/assets/landing/covers/lc-oscillations.jpg"
+import photosynthesisCover from "@/assets/landing/covers/photosynthesis.jpg"
+import diversityAnimalsCover from "@/assets/landing/covers/diversity-animals.jpg"
+import chemicalKineticsCover from "@/assets/landing/covers/chemical-kinetics.jpg"
+import carbonSiliconCover from "@/assets/landing/covers/carbon-silicon.jpg"
+import kazakhstanWwiiCover from "@/assets/landing/covers/kazakhstan-wwii.jpg"
+import independenceKazakhstanCover from "@/assets/landing/covers/independence-kazakhstan.jpg"
+import geometricSequencesCover from "@/assets/landing/covers/geometric-sequences.jpg"
+import combinedEventsCover from "@/assets/landing/covers/combined-events.jpg"
+import graphingLinesCover from "@/assets/landing/covers/graphing-lines.jpg"
+import {
+	ABOUT_CAPSULE,
+	ABOUT_TITLE,
+	FAQ_ITEMS,
+	HERO_EYEBROW,
+} from "@/content/landing"
+import { LANGUAGE_OPTIONS, LOCALE_COOKIE } from "@/i18n/config"
+import { createTranslator } from "@/i18n/translate"
 
 const ASSET_ROOT = "/images/landing"
 const bilimLogo = `${ASSET_ROOT}/new-bilimai-logo.svg`
-const bifPartnerLogo = `${ASSET_ROOT}/partners/bif.png`
-const bilPartnerLogo = `${ASSET_ROOT}/partners/bil.png`
-const nurordaPartnerLogo = `${ASSET_ROOT}/partners/nurorda-logo.png`
-const sdlPartnerLogo = `${ASSET_ROOT}/partners/sdl.png`
-const sduPartnerLogo = `${ASSET_ROOT}/partners/sdu.png`
-const spectrumPartnerLogo = `${ASSET_ROOT}/partners/spectrum.png`
-const mitosisCover = `${ASSET_ROOT}/marketplace-lessons/mitosis.jpg`
-const parallaxCover = `${ASSET_ROOT}/marketplace-lessons/parallax.jpg`
-const lcOscillationsCover = `${ASSET_ROOT}/marketplace-lessons/lc-oscillations.jpg`
-const photosynthesisCover = `${ASSET_ROOT}/marketplace-lessons/photosynthesis.jpg`
-const diversityAnimalsCover = `${ASSET_ROOT}/marketplace-lessons/diversity-animals.jpg`
-const chemicalKineticsCover = `${ASSET_ROOT}/marketplace-lessons/chemical-kinetics.jpg`
-const carbonSiliconCover = `${ASSET_ROOT}/marketplace-lessons/carbon-silicon.jpg`
-const kazakhstanWwiiCover = `${ASSET_ROOT}/marketplace-lessons/kazakhstan-wwii.jpg`
-const independenceKazakhstanCover = `${ASSET_ROOT}/marketplace-lessons/independence-kazakhstan.jpg`
-const geometricSequencesCover = `${ASSET_ROOT}/marketplace-lessons/geometric-sequences.jpg`
-const combinedEventsCover = `${ASSET_ROOT}/marketplace-lessons/combined-events.jpg`
-const graphingLinesCover = `${ASSET_ROOT}/marketplace-lessons/graphing-lines.jpg`
 
-const APP_ORIGIN = (process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "")
 // Env сервера лендинга нам недоступен, поэтому рабочие значения зашиты
 // фолбэками (как у WAITLIST_API_ENDPOINT ниже). Апекс — прод-сайт, поэтому
 // проверяем прод-сессию и уводим на прод-платформу; для дев-стенда задайте
@@ -77,68 +86,12 @@ const WAITLIST_PROXY_ENDPOINT = "/api/waitlist"
 const WAITLIST_API_ENDPOINT =
 	process.env.NEXT_PUBLIC_WAITLIST_API_URL ||
 	"https://api.dev.bilimai.kz/api/v1/auth/waitlist/"
-const appUrl = (path) => `${APP_ORIGIN}${path}`
-// Через PLATFORM_URL, а не appUrl: у appUrl основание APP_ORIGIN, и без
-// NEXT_PUBLIC_APP_URL оно пустое — ссылка молча уехала бы на сам лендинг.
+const appUrl = (path) => `${PLATFORM_URL}${path}`
 const LOGIN_URL = `${PLATFORM_URL}/login`
+// Блог только на ru и kk: с английской версии ведём в русский.
+const blogUrl = (language) => `/${language === "en" ? "ru" : language}/blog`
 const WHATSAPP_NUMBER_ERROR =
 	"Введите номер в международном формате, например +7 700 000 00 00."
-const DEFAULT_LANGUAGE = "kk"
-const LANGUAGE_STORAGE_KEY = "bilim-landing-language"
-const LANGUAGE_CHANGE_EVENT = "bilim-landing-language-change"
-const supportedLanguages = new Set(
-	LANGUAGE_OPTIONS.map((option) => option.code),
-)
-let inMemoryLanguage = DEFAULT_LANGUAGE
-
-const getLanguageSnapshot = () => {
-	try {
-		const storedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
-		return supportedLanguages.has(storedLanguage)
-			? storedLanguage
-			: inMemoryLanguage
-	} catch {
-		return inMemoryLanguage
-	}
-}
-
-const subscribeToLanguage = (onLanguageChange) => {
-	const handleStorage = (event) => {
-		if (event.key === LANGUAGE_STORAGE_KEY) onLanguageChange()
-	}
-
-	window.addEventListener("storage", handleStorage)
-	window.addEventListener(LANGUAGE_CHANGE_EVENT, onLanguageChange)
-
-	return () => {
-		window.removeEventListener("storage", handleStorage)
-		window.removeEventListener(LANGUAGE_CHANGE_EVENT, onLanguageChange)
-	}
-}
-
-const setStoredLanguage = (language) => {
-	if (!supportedLanguages.has(language)) return
-	inMemoryLanguage = language
-	try {
-		window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
-	} catch {
-		// The switcher still works when browser storage is unavailable.
-	}
-	window.dispatchEvent(new Event(LANGUAGE_CHANGE_EVENT))
-}
-
-function useStoredLanguage() {
-	const [language, setLanguage] = useState(DEFAULT_LANGUAGE)
-
-	useEffect(() => {
-		const syncLanguage = () => setLanguage(getLanguageSnapshot())
-		const unsubscribe = subscribeToLanguage(syncLanguage)
-		syncLanguage()
-		return unsubscribe
-	}, [])
-
-	return language
-}
 
 // Залогиненного на платформе юзера уводим туда сразу. sessionid — host-only
 // httpOnly кука api-хоста; апекс → api-поддомен same-site, браузер приложит
@@ -426,7 +379,7 @@ function WaitlistModal({ open, onClose }) {
 						<h2 id='waitlist-title'>{t("Вы в списке ожидания")}</h2>
 						<p>
 							{t(
-								"Свяжемся с вами в WhatsApp, когда Bilim AI будет готов к раннему доступу.",
+								"Свяжемся с вами в WhatsApp, когда откроем доступ.",
 							)}
 						</p>
 						<button
@@ -446,7 +399,7 @@ function WaitlistModal({ open, onClose }) {
 							</h2>
 							<p>
 								{t(
-									"Участникам списка ожидания мы откроем все премиум-функции на старте — бесплатно.",
+									"Мы напишем вам, когда откроем доступ.",
 								)}
 							</p>
 						</header>
@@ -579,16 +532,28 @@ function WaitlistModal({ open, onClose }) {
 	)
 }
 
+// Явный выбор языка запоминаем в cookie: по ней корень "/" редиректит на
+// нужную версию (next.config.ts). Простой просмотр страницы её не пишет.
+const rememberLanguage = (code) => {
+	const secure = window.location.protocol === "https:" ? "; Secure" : ""
+	document.cookie = `${LOCALE_COOKIE}=${code}; Path=/; Max-Age=31536000; SameSite=Lax${secure}`
+}
+
 // Выбор языка своей разметкой, а не нативным <select>: тот открывался
 // системным списком ОС — прямые углы, синяя подсветка Windows, свой шрифт —
 // и посреди лендинга это выглядело чужеродно. Цена замены — то, что <select>
-// делал сам: закрытие по клику вне и по Escape, роли listbox/option и
-// стрелки вверх-вниз. Всё это ниже.
+// делал сам: закрытие по клику вне и по Escape и стрелки вверх-вниз. Всё
+// это ниже.
+//
+// Пункты — обычные ссылки на /kk, /ru, /en (полная загрузка документа
+// обновляет <html lang> и метаданные). Меню всегда в разметке, закрытое —
+// с hidden: так ссылки на языковые версии видны краулерам в SSR-HTML.
 function LanguageSwitcher({ onSelect }) {
-	const { language, setLanguage, t } = useI18n()
+	const { language, t } = useI18n()
 	const [open, setOpen] = useState(false)
 	const rootRef = useRef(null)
 	const menuRef = useRef(null)
+	const menuId = useId()
 	const current =
 		LANGUAGE_OPTIONS.find((option) => option.code === language) ||
 		LANGUAGE_OPTIONS[0]
@@ -608,9 +573,7 @@ function LanguageSwitcher({ onSelect }) {
 				return
 			}
 			if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return
-			const items = [
-				...(menuRef.current?.querySelectorAll("[role='option']") || []),
-			]
+			const items = [...(menuRef.current?.querySelectorAll("a[href]") || [])]
 			if (!items.length) return
 			event.preventDefault()
 			const at = items.indexOf(document.activeElement)
@@ -627,8 +590,10 @@ function LanguageSwitcher({ onSelect }) {
 		}
 	}, [open])
 
+	// Меню закрываем до ухода со страницы: иначе кнопка «Назад» достанет
+	// её из bfcache с открытым меню.
 	const choose = (code) => {
-		setLanguage(code)
+		rememberLanguage(code)
 		setOpen(false)
 		onSelect?.()
 	}
@@ -641,8 +606,8 @@ function LanguageSwitcher({ onSelect }) {
 			<button
 				className='language-switcher__trigger'
 				type='button'
-				aria-haspopup='listbox'
 				aria-expanded={open}
+				aria-controls={menuId}
 				aria-label={`${t("Выбрать язык")}: ${current.label}`}
 				onClick={() => setOpen((value) => !value)}
 			>
@@ -654,36 +619,35 @@ function LanguageSwitcher({ onSelect }) {
 					aria-hidden='true'
 				/>
 			</button>
-			{open ? (
-				<div
-					className='language-switcher__menu'
-					ref={menuRef}
-					role='listbox'
-					aria-label={t("Выбрать язык")}
-				>
-					{LANGUAGE_OPTIONS.map((option) => (
-						<button
-							className='language-switcher__option'
-							key={option.code}
-							type='button'
-							role='option'
-							aria-selected={option.code === language}
-							onClick={() => choose(option.code)}
-						>
-							<span>{option.label}</span>
-							<i>{option.short}</i>
-							<Check size={15} aria-hidden='true' />
-						</button>
-					))}
-				</div>
-			) : null}
+			<div
+				className='language-switcher__menu'
+				id={menuId}
+				ref={menuRef}
+				hidden={!open}
+			>
+				{LANGUAGE_OPTIONS.map((option) => (
+					<a
+						className='language-switcher__option'
+						key={option.code}
+						href={`/${option.code}`}
+						hrefLang={option.code}
+						lang={option.code}
+						aria-current={option.code === language ? "page" : undefined}
+						onClick={() => choose(option.code)}
+					>
+						<span>{option.label}</span>
+						<i>{option.short}</i>
+						<Check size={15} aria-hidden='true' />
+					</a>
+				))}
+			</div>
 		</div>
 	)
 }
 
 function Navigation() {
 	const [open, setOpen] = useState(false)
-	const { t } = useI18n()
+	const { language, t } = useI18n()
 
 	useEffect(() => {
 		const close = () => setOpen(false)
@@ -716,6 +680,9 @@ function Navigation() {
 					</a>
 					<a href='#faq' onClick={() => setOpen(false)}>
 						{t("Вопросы")}
+					</a>
+					<a href={blogUrl(language)} onClick={() => setOpen(false)}>
+						{t("Блог")}
 					</a>
 				</div>
 				<div className='nav-actions'>
@@ -1115,7 +1082,7 @@ function MiniBrowser({
 function FloatingCombinedEventsLesson() {
 	return (
 		<div className='float-card float-card--lesson hero-marketplace-card'>
-			<MarketplaceLessonCard lesson={MARKETPLACE_LESSONS[6]} />
+			<MarketplaceLessonCard lesson={MARKETPLACE_LESSONS[6]} eager />
 		</div>
 	)
 }
@@ -1149,7 +1116,7 @@ function FloatingPlan() {
 function FloatingChemistryLesson() {
 	return (
 		<div className='float-card float-card--class hero-marketplace-card'>
-			<MarketplaceLessonCard lesson={MARKETPLACE_LESSONS[8]} />
+			<MarketplaceLessonCard lesson={MARKETPLACE_LESSONS[8]} eager />
 		</div>
 	)
 }
@@ -1249,8 +1216,7 @@ function FloatingLibrary() {
 function Hero({ onWaitlistOpen }) {
 	const { t } = useI18n()
 	return (
-		<header className='hero' id='top'>
-			<Navigation />
+		<section className='hero' aria-labelledby='hero-title'>
 			<div className='hero-stage'>
 				<FloatingCombinedEventsLesson />
 				<FloatingPlan />
@@ -1258,12 +1224,13 @@ function Hero({ onWaitlistOpen }) {
 				<FloatingChemistryLesson />
 				<FloatingClass />
 				<FloatingTest />
-				<div className='hero-copy' data-reveal>
+				{/* Без data-reveal: заголовок первого экрана не должен ждать JS. */}
+				<div className='hero-copy'>
 					<div className='eyebrow'>
-						<span className='eyebrow__accent'>{t("Скоро!")}</span>
-						<span>{t("Платформа в разработке")}</span>
+						<span className='eyebrow__accent'>{t(HERO_EYEBROW.accent)}</span>
+						<span>{t(HERO_EYEBROW.text)}</span>
 					</div>
-					<h1>
+					<h1 id='hero-title'>
 						<span>{t("Единое пространство")}</span>{" "}
 						{t("для современного учебного процесса")}
 					</h1>
@@ -1302,7 +1269,7 @@ function Hero({ onWaitlistOpen }) {
 					</a>
 				</div>
 			</div>
-		</header>
+		</section>
 	)
 }
 
@@ -1333,9 +1300,12 @@ function PartnerGroup({ duplicate = false }) {
 					role={duplicate ? undefined : "listitem"}
 					key={partner.name}
 				>
-					<img
+					<NextImage
 						src={partner.logo}
 						alt={duplicate ? "" : partner.name}
+						// Ширина логотипа в ленте — --partner-width (квадратные — 64px).
+						sizes={partner.width}
+						loading='lazy'
 					/>
 				</div>
 			))}
@@ -1348,8 +1318,11 @@ function PartnerMarquee() {
 	return (
 		<section
 			className='partner-marquee section-pad'
-			aria-label={t("Партнёры Bilim AI")}
+			aria-labelledby='partners-title'
 		>
+			<h2 className='partner-marquee__title' id='partners-title'>
+				{t("Нам доверяют")}
+			</h2>
 			<div className='partner-marquee__viewport'>
 				<div className='partner-marquee__track'>
 					<PartnerGroup />
@@ -1538,14 +1511,37 @@ function PlatformPillarVisual({ type }) {
 	)
 }
 
+// Ответ-капсула: короткий самодостаточный ответ «что это», который
+// поисковики и ИИ-ассистенты могут цитировать целиком.
+function About() {
+	const { t } = useI18n()
+	return (
+		<section
+			className='about section-pad'
+			id='about'
+			aria-labelledby='about-title'
+		>
+			{/* Без data-reveal: на телефонах капсула попадает в первый экран и
+			    может быть LCP — она не должна ждать JS. */}
+			<div className='about__inner'>
+				<h2 id='about-title'>{t(ABOUT_TITLE)}</h2>
+				<p>{t(ABOUT_CAPSULE)}</p>
+			</div>
+		</section>
+	)
+}
+
 function PlatformOverview() {
 	const { t } = useI18n()
 	return (
 		<section
 			className='platform-overview section-pad'
 			id='product'
-			aria-label={t("Возможности Bilim AI")}
+			aria-labelledby='product-title'
 		>
+			<div className='platform-overview__heading' data-reveal>
+				<h2 id='product-title'>{t("Возможности Bilim AI")}</h2>
+			</div>
 			<div className='platform-pillars'>
 				{PLATFORM_PILLARS.map((pillar, index) => (
 					<article
@@ -2009,39 +2005,16 @@ function SecondaryFeatures() {
 	return <PersonaSection />
 }
 
-const FAQ_ITEMS = [
-	[
-		"Что такое BilimAI?",
-		"BilimAI — это платформа на базе ИИ, которая помогает создавать структурированные уроки по любой теме и даёт ученикам умные инструменты для обучения.",
-	],
-	[
-		"BilimAI заменяет учителей?",
-		"Нет. BilimAI сокращает время на подготовку, чтобы учителя могли сосредоточиться на главном — преподавании и работе с учениками.",
-	],
-	[
-		"Можно ли создавать уроки вне учебной программы?",
-		"Да. Учителя могут создавать уроки как по темам официальной программы, так и по любым своим темам.",
-	],
-	[
-		"Что входит в урок, созданный ИИ?",
-		"Каждый урок включает объяснения, примеры, упражнения и задания для проверки знаний — всё в чёткой и последовательной структуре.",
-	],
-	[
-		"Могут ли учителя делиться уроками?",
-		"Да. В BilimAI есть маркетплейс, где учителя могут делиться уроками, находить материалы других авторов и адаптировать их под свои нужды.",
-	],
-	[
-		"Платформа уже доступна?",
-		"BilimAI сейчас в разработке и скоро будет запущена.",
-	],
-]
-
 function FAQ() {
 	const { t } = useI18n()
 	return (
-		<section className='faq section-pad' id='faq'>
+		<section
+			className='faq section-pad'
+			id='faq'
+			aria-labelledby='faq-title'
+		>
 			<div className='faq__intro' data-reveal>
-				<h2>{t("Остались вопросы?")}</h2>
+				<h2 id='faq-title'>{t("Остались вопросы?")}</h2>
 			</div>
 			<div
 				className='faq__list'
@@ -2051,8 +2024,8 @@ function FAQ() {
 				{FAQ_ITEMS.map(([question, answer], index) => (
 					<details key={question} open={index === 0}>
 						<summary>
-							<span>{t(question)}</span>
-							<ChevronDown size={20} />
+							<h3>{t(question)}</h3>
+							<ChevronDown size={20} aria-hidden='true' />
 						</summary>
 						<p>{t(answer)}</p>
 					</details>
@@ -2196,7 +2169,23 @@ const MARKETPLACE_LESSONS = [
 	},
 ]
 
-function MarketplaceLessonCard({ lesson, duplicate = false, linked = true }) {
+// Уроки в MARKETPLACE_LESSONS взяты из dev-базы и на проде не существуют,
+// поэтому по умолчанию карточки декоративные. Ссылки вернёт linked, когда
+// карточки перепривяжут к прод-урокам по UUID.
+// sizes — измеренная ширина картинки: в split она занимает 43 % карточки
+// (до 142 px, в hero до 126 px), в cover — всю карточку (до 330 px).
+// eager только у двух hero-карточек первого экрана: это кандидаты в LCP.
+function lessonImageSizes(lesson, eager) {
+	if (eager) return "126px"
+	return lesson.layout === "split" ? "142px" : "330px"
+}
+
+function MarketplaceLessonCard({
+	lesson,
+	duplicate = false,
+	linked = false,
+	eager = false,
+}) {
 	const { t } = useI18n()
 	const Card = linked ? "a" : "div"
 	const translatedTitle = t(lesson.title)
@@ -2214,7 +2203,13 @@ function MarketplaceLessonCard({ lesson, duplicate = false, linked = true }) {
 			tabIndex={linked && duplicate ? -1 : undefined}
 		>
 			<div className='marketplace-lesson-card__preview'>
-				<img src={lesson.image} alt='' loading='lazy' />
+				<NextImage
+					src={lesson.image}
+					alt=''
+					sizes={lessonImageSizes(lesson, eager)}
+					loading={eager ? "eager" : "lazy"}
+					fetchPriority={eager ? "high" : undefined}
+				/>
 				<div className='marketplace-lesson-card__shade' />
 				<div className='marketplace-lesson-card__copy'>
 					<small>{t(lesson.subject)}</small>
@@ -2289,7 +2284,7 @@ function FinalCta({ onWaitlistOpen }) {
 			</div>
 			<div
 				className='marketplace-ribbons'
-				aria-label={t("Уроки из маркетплейса Bilim AI")}
+				aria-label={t("Уроки из Галереи материалов Bilim AI")}
 			>
 				<MarketplaceRibbon lessons={MARKETPLACE_LESSONS.slice(0, 6)} />
 				<MarketplaceRibbon
@@ -2301,8 +2296,8 @@ function FinalCta({ onWaitlistOpen }) {
 	)
 }
 
-function Footer({ copyrightYear }) {
-	const { t } = useI18n()
+function Footer() {
+	const { language, t } = useI18n()
 	return (
 		<footer className='footer section-pad'>
 			<div className='footer__top'>
@@ -2317,11 +2312,13 @@ function Footer({ copyrightYear }) {
 						<a href='#workflow'>{t("Как работает")}</a>
 						<a href='#classes'>{t("Для классов")}</a>
 						<a href='#faq'>{t("Частые вопросы")}</a>
+						<a href={appUrl("/marketplace")}>{t("Галерея материалов")}</a>
+						<a href={blogUrl(language)}>{t("Блог")}</a>
 					</div>
 				</div>
 			</div>
 			<div className='footer__bottom'>
-				<span>© {copyrightYear} Bilim AI</span>
+				<span>© 2026 Bilim AI</span>
 			</div>
 		</footer>
 	)
@@ -2353,39 +2350,33 @@ function useReveal() {
 	}, [])
 }
 
-export default function App({ copyrightYear }) {
+// Язык приходит из URL (/kk, /ru, /en), словарь — только текущего языка
+// (src/app/[lang]/page.tsx). Пропсы описаны в Landing.d.ts.
+export default function App({ lang, messages }) {
 	useSessionRedirect()
 	const [waitlistOpen, setWaitlistOpen] = useState(false)
-	const language = useStoredLanguage()
 	useReveal()
 
-	useEffect(() => {
-		document.documentElement.lang = language
-		document.title =
-			language === "kk"
-				? "Bilim AI — сабақтар, тесттер және сыныптар бір кеңістікте"
-				: language === "en"
-					? "Bilim AI — lessons, tests, and classes in one space"
-					: "Bilim AI — уроки, тесты и классы в одном пространстве"
-	}, [language])
-
-	const i18n = {
-		language,
-		setLanguage: setStoredLanguage,
-		t: (source, variables) => translate(language, source, variables),
-	}
+	const i18n = useMemo(
+		() => ({ language: lang, t: createTranslator(messages) }),
+		[lang, messages],
+	)
 
 	return (
 		<LanguageContext.Provider value={i18n}>
-			<Hero onWaitlistOpen={() => setWaitlistOpen(true)} />
-			<main>
+			<header className='site-header' id='top'>
+				<Navigation />
+			</header>
+			<main id='main'>
+				<Hero onWaitlistOpen={() => setWaitlistOpen(true)} />
+				<About />
 				<PlatformOverview />
 				<PartnerMarquee />
 				<SecondaryFeatures />
 				<FAQ />
 				<FinalCta onWaitlistOpen={() => setWaitlistOpen(true)} />
 			</main>
-			<Footer copyrightYear={copyrightYear} />
+			<Footer />
 			{waitlistOpen ? (
 				<WaitlistModal open onClose={() => setWaitlistOpen(false)} />
 			) : null}

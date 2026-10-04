@@ -1,0 +1,53 @@
+# Bilim AI
+
+> Bilim AI is an AI platform for school teachers in Kazakhstan. Teachers use it to generate curriculum plans (ҰМЖ, ОМЖ, КТЖ, ҚМЖ), lessons and slides, and unit and term summative assessments (БЖБ/СОР and ТЖБ/СОЧ), including grading paper answer sheets from a photo — in Kazakh, Russian and English.
+
+## What Bilim AI is
+
+- A planning, lesson-authoring, assessment and class-management workspace for teachers, built around the Kazakhstan state curriculum.
+- The teacher stays in control: every generated plan, lesson or test is a draft the teacher reviews, edits and approves before use.
+- Materials can be shared through the public Materials gallery (Галерея материалов / Материалдар галереясы, https://app.bilimai.kz/marketplace), where other teachers find, copy and adapt them.
+
+## What Bilim AI is not
+
+- Not a general-purpose chatbot and not a student-facing tutor.
+- Not a replacement for teachers; it shortens preparation time so teachers can spend it on teaching.
+- Not a source of official curriculum documents — it produces documents in the formats schools require, based on the official topics.
+
+## Products and document types
+
+- Curriculum plans: ҰМЖ (long-term plan; ru: ДСП), ОМЖ (mid-term plan; ru: ССП), КТЖ (calendar-thematic plan; ru: КТП), ҚМЖ (short-term lesson plan; ru: КСП).
+- Lessons: structured AI-generated lessons and slides with explanations, examples, exercises and checks for understanding.
+- Assessments: БЖБ (summative assessment for a unit; ru: СОР) and ТЖБ (summative assessment for a term; ru: СОЧ), online tests, and photo-based grading of paper answer sheets.
+- Classes: assign lessons and tests to a class and see results for paper and online work in one place.
+- Materials gallery: a public library of teacher-made lessons and tests; open without sign-in.
+
+## Languages
+
+- Interface and generated content: Kazakh (kk), Russian (ru), English (en).
+- Website: https://bilimai.kz/kk (Kazakh), https://bilimai.kz/ru (Russian), https://bilimai.kz/en (English).
+
+## Stage and availability
+
+- Bilim AI is in early access at https://app.bilimai.kz: pilot schools use it now; other teachers and schools can join the waitlist at https://bilimai.kz.
+- The Materials gallery is public and needs no sign-in.
+- Pricing: no public prices; early access is free for teachers.
+
+## Key links
+
+- Website: https://bilimai.kz/kk · https://bilimai.kz/ru · https://bilimai.kz/en
+- Blog: https://bilimai.kz/ru/blog · https://bilimai.kz/kk/blog
+- Materials gallery: https://app.bilimai.kz/marketplace
+- Sign in (existing accounts): https://app.bilimai.kz/login
+- FAQ: https://bilimai.kz/ru#faq
+
+## Company
+
+- GitHub: https://github.com/bilim-innovation-fund
+- Partners and pilot schools include NURORDA, SDU University, Bilim Innovation Lyceums, Spectrum International School and SDL School.
+
+## Naming
+
+- Canonical brand spelling: "Bilim AI" (two words). Alternate forms: BilimAI, Білім AI, Билим AI.
+
+Last updated: 2026-10-05

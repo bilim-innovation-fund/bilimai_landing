@@ -1,11 +1,3 @@
-@font-face {
-  font-family: "Geist";
-  src: url("/images/landing/fonts/Geist-Variable.woff2") format("woff2");
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   --ink: #1c1e1d;
   --muted: #676d69;
@@ -28,7 +20,7 @@
   --shadow: 0 28px 80px -40px rgba(35, 27, 76, 0.32);
   color: var(--ink);
   background: var(--paper);
-  font-family: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-geist), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -93,17 +85,28 @@ svg {
   padding-inline: 40px;
 }
 
+/* Прячем только под body.js (класс ставит inline-скрипт в layout): без JS
+   и для краулеров, не исполняющих JS, текст виден сразу. */
 [data-reveal] {
-  opacity: 0;
-  transform: translate3d(0, 22px, 0);
   transition:
     opacity 700ms cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms),
     transform 700ms cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms);
 }
 
-[data-reveal].is-visible {
-  opacity: 1;
-  transform: none;
+body.js [data-reveal]:not(.is-visible) {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    transition: none;
+  }
+
+  body.js [data-reveal]:not(.is-visible) {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .nav-shell {
@@ -243,6 +246,12 @@ svg {
   animation: language-menu-in 140ms ease;
 }
 
+/* Меню всегда в разметке (ссылки на языки видны краулерам), закрытое — с
+   hidden. display: flex выше перебивает UA-стиль [hidden], поэтому явно. */
+.language-switcher__menu[hidden] {
+  display: none;
+}
+
 @keyframes language-menu-in {
   from {
     opacity: 0;
@@ -295,15 +304,15 @@ svg {
   opacity: 0;
 }
 
-.language-switcher__option[aria-selected="true"] {
+.language-switcher__option[aria-current="page"] {
   color: var(--brand-green);
 }
 
-.language-switcher__option[aria-selected="true"] > i {
+.language-switcher__option[aria-current="page"] > i {
   color: var(--brand-green);
 }
 
-.language-switcher__option[aria-selected="true"] > svg {
+.language-switcher__option[aria-current="page"] > svg {
   opacity: 1;
 }
 
@@ -564,6 +573,25 @@ svg {
 
 @keyframes waitlist-sheet-in {
   from { transform: translateY(100%); }
+}
+
+/* Навигация вынесена из .hero в <header class="site-header">: та же сетка
+   фона, чтобы полоса меню выглядела как раньше. */
+.site-header {
+  position: relative;
+}
+
+.site-header::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background-image: url("/images/landing/intro-grid.svg");
+  background-position: left top;
+  background-repeat: repeat;
+  background-size: 88px auto;
+  content: "";
+  opacity: 0.03;
+  pointer-events: none;
 }
 
 .hero {
@@ -1188,6 +1216,16 @@ svg {
   background: transparent;
 }
 
+.partner-marquee__title {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
 .partner-marquee__viewport {
   overflow: hidden;
   padding: 31px 0;
@@ -1221,6 +1259,8 @@ svg {
 .partner-marquee__item img {
   display: block;
   width: 100%;
+  /* next/image ставит атрибут height: без auto он стал бы CSS-высотой. */
+  height: auto;
   max-height: 52px;
   object-fit: contain;
   filter: grayscale(1);
@@ -3041,6 +3081,13 @@ svg {
   cursor: pointer;
 }
 
+/* Вопрос — h3 для структуры документа, выглядит как прежний span. */
+.faq summary h3 {
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
 .faq summary::-webkit-details-marker {
   display: none;
 }
@@ -3233,10 +3280,47 @@ svg {
   font-size: 12px;
 }
 
+/* About: ответ-капсула «Что такое Bilim AI?» сразу после hero */
+.about {
+  padding-top: 96px;
+}
+
+.about__inner {
+  display: grid;
+  grid-template-columns: 0.75fr 1.25fr;
+  gap: 90px;
+  align-items: start;
+}
+
+.about__inner h2 {
+  font-size: clamp(32px, 3.4vw, 48px);
+  font-weight: 560;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+}
+
+.about__inner p {
+  max-width: 760px;
+  color: #3f4441;
+  font-size: clamp(18px, 1.45vw, 21px);
+  line-height: 1.55;
+}
+
 /* Platform overview */
 .platform-overview {
   padding-top: 72px;
   padding-bottom: 180px;
+}
+
+.platform-overview__heading {
+  margin-bottom: 40px;
+}
+
+.platform-overview__heading h2 {
+  font-size: clamp(32px, 3.4vw, 48px);
+  font-weight: 560;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
 }
 
 .platform-pillars {
@@ -4996,15 +5080,20 @@ svg {
   .language-switcher {
     width: 100%;
     margin-top: 10px;
+    flex-direction: column;
   }
 
   .language-switcher__trigger {
     justify-content: center;
   }
 
+  /* В бургер-панели (overflow: hidden) выпадающее меню обрезалось:
+     здесь оно в потоке и раздвигает панель. */
   .language-switcher__menu {
-    left: 0;
+    position: static;
     min-width: 0;
+    margin-top: 8px;
+    box-shadow: none;
   }
 
   .nav-actions .button {
@@ -5117,6 +5206,15 @@ svg {
   .faq {
     grid-template-columns: 1fr;
     gap: 46px;
+  }
+
+  .about {
+    padding-top: 64px;
+  }
+
+  .about__inner {
+    grid-template-columns: 1fr;
+    gap: 18px;
   }
 }
 
@@ -5867,7 +5965,7 @@ svg {
   --product-green: #00704a;
   --product-green-soft: #e7f1ec;
   color: var(--product-ink);
-  font-family: "Geist", system-ui, -apple-system, sans-serif;
+  font-family: var(--font-geist), system-ui, -apple-system, sans-serif;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.01em;
 }
@@ -7063,7 +7161,7 @@ svg {
     linear-gradient(90deg, rgba(20, 20, 19, 0.024) 1px, transparent 1px);
   background-size: 0.675cqw 0.675cqw;
   container-type: inline-size;
-  font-family: "Geist", system-ui, -apple-system, sans-serif;
+  font-family: var(--font-geist), system-ui, -apple-system, sans-serif;
   font-size: 1cqw;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.01em;
@@ -8558,5 +8656,449 @@ svg {
 
   .marketplace-ribbon__group[aria-hidden="true"] {
     display: none;
+  }
+}
+
+/* Глобальная 404 (src/app/global-not-found.tsx): один экран, три языка. */
+.not-found {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+  gap: 22px;
+  padding-block: 64px;
+}
+
+.not-found__code {
+  margin: 12px 0 0;
+  color: var(--brand-green);
+  font-size: 14px;
+  font-weight: 720;
+  letter-spacing: 0.08em;
+}
+
+.not-found__message h1,
+.not-found__message h2 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.not-found__message h2 {
+  color: var(--muted);
+  font-size: clamp(22px, 3vw, 32px);
+}
+
+.not-found__message p {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.not-found__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Блог (src/app/[lang]/blog) ------------------------------------------ */
+.blog-nav__links {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  font-size: 14px;
+  font-weight: 560;
+}
+
+.blog-nav__links a,
+.blog-nav__languages a {
+  color: var(--muted);
+  transition: color 160ms ease;
+}
+
+.blog-nav__links a:hover,
+.blog-nav__languages a:hover,
+.blog-nav__links a[aria-current="page"],
+.blog-nav__languages a[aria-current="page"] {
+  color: var(--ink);
+}
+
+.blog-nav__aside {
+  display: flex;
+  justify-self: end;
+  align-items: center;
+  gap: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.blog-nav__languages {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+}
+
+/* На узких экранах — короткие коды языков, иначе шапка не влезает в 320px. */
+.blog-lang__short {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  .blog-lang__long {
+    display: none;
+  }
+
+  .blog-lang__short {
+    display: inline;
+  }
+
+  .blog-nav__aside {
+    gap: 12px;
+  }
+
+  .blog-nav__languages {
+    gap: 8px;
+  }
+}
+
+.blog {
+  padding-top: 32px;
+  padding-bottom: 110px;
+}
+
+.blog-hero {
+  max-width: 760px;
+  margin: 24px 0 48px;
+}
+
+.blog-hero h1 {
+  font-size: clamp(40px, 5vw, 68px);
+  font-weight: 560;
+  letter-spacing: -0.048em;
+  line-height: 1;
+}
+
+.blog-hero p {
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.blog-empty {
+  color: var(--muted);
+  font-size: 17px;
+}
+
+.post-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 28px;
+}
+
+.post-card__link {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.post-card__link:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.post-card__cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1200 / 630;
+  object-fit: cover;
+}
+
+.post-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 22px 22px;
+}
+
+.post-card__body h2,
+.post-card__body h3 {
+  font-size: 21px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.post-card__body p {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.post-card__body .post-meta {
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+.post-category {
+  color: var(--brand-green);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.post-meta > :not(:first-child)::before {
+  margin-right: 10px;
+  color: #a3a8a5;
+  content: "·";
+}
+
+.post {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.post-breadcrumb {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 28px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.post-breadcrumb a:hover {
+  color: var(--ink);
+}
+
+.post-header h1 {
+  margin-top: 12px;
+  font-size: clamp(34px, 4.4vw, 54px);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+
+.post-lead {
+  margin-top: 18px;
+  color: #3f4441;
+  font-size: 19px;
+  line-height: 1.55;
+}
+
+.post-header .post-meta {
+  margin-top: 18px;
+}
+
+.post-cover {
+  margin: 32px 0 40px;
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
+.post-cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.prose {
+  color: #2b2f2d;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.prose > * + *,
+.post-summary > * + * {
+  margin-top: 1.1em;
+}
+
+.prose h2 {
+  margin-top: 2em;
+  font-size: 28px;
+  font-weight: 640;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  scroll-margin-top: 24px;
+}
+
+.prose h3 {
+  margin-top: 1.6em;
+  font-size: 22px;
+  font-weight: 640;
+  line-height: 1.25;
+}
+
+.prose a {
+  color: var(--brand-green);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.prose ul,
+.prose ol {
+  margin-bottom: 0;
+  padding-left: 1.3em;
+}
+
+.prose li + li {
+  margin-top: 0.4em;
+}
+
+.prose blockquote {
+  margin-inline: 0;
+  padding-left: 18px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+
+.prose code {
+  padding: 0.1em 0.35em;
+  border-radius: 6px;
+  background: var(--paper-deep);
+  font-size: 0.9em;
+}
+
+.prose pre {
+  overflow-x: auto;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--ink);
+  color: #e9ece8;
+  font-size: 14px;
+}
+
+.prose pre code {
+  padding: 0;
+  background: none;
+}
+
+.prose__table {
+  overflow-x: auto;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+
+.prose th,
+.prose td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose th {
+  font-weight: 650;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+/* Итог для учителя (rehype-summary.mjs): section, не aside — экстракторы
+   текста вырезают aside целиком. */
+.post-summary {
+  margin-top: 2.2em;
+  padding: 24px 26px 26px;
+  border-radius: var(--radius);
+  background: var(--purple-soft);
+}
+
+.prose .post-summary h2 {
+  margin-top: 0;
+}
+
+.callout {
+  padding: 18px 20px;
+  border-left: 3px solid var(--brand-green);
+  border-radius: 0 12px 12px 0;
+  background: #eef5f1;
+}
+
+.post-related {
+  max-width: 1080px;
+  margin: 72px auto 0;
+}
+
+.post-related > h2 {
+  margin-bottom: 24px;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.post-back {
+  max-width: 720px;
+  margin: 48px auto 0;
+  font-size: 15px;
+}
+
+.post-back a {
+  color: var(--brand-green);
+}
+
+.blog-footer .footer__links {
+  width: min(440px, 100%);
+  grid-template-columns: repeat(2, minmax(150px, 1fr));
+  gap: 32px;
+}
+
+.blog-footer .footer__links a[aria-current="page"] {
+  color: var(--brand-green);
+}
+
+@media (max-width: 760px) {
+  .blog-nav {
+    grid-template-columns: auto 1fr;
+  }
+
+  .blog-nav__links {
+    display: none;
+  }
+
+  .prose {
+    font-size: 17px;
+  }
+
+  .prose h2 {
+    font-size: 24px;
+  }
+
+  .post-lead {
+    font-size: 17px;
+  }
+
+  .post-summary {
+    padding: 20px;
+  }
+
+  .blog-footer .footer__links {
+    grid-template-columns: 1fr 1fr;
+    justify-self: start;
   }
 }
