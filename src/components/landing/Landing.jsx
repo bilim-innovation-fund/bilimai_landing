@@ -1255,7 +1255,8 @@ function Hero({ onWaitlistOpen }) {
 				<FloatingChemistryLesson />
 				<FloatingClass />
 				<FloatingTest />
-				<div className='hero-copy' data-reveal>
+				{/* Без data-reveal: заголовок первого экрана не должен ждать JS. */}
+				<div className='hero-copy'>
 					<div className='eyebrow'>
 						<span className='eyebrow__accent'>{t("Скоро!")}</span>
 						<span>{t("Платформа в разработке")}</span>
