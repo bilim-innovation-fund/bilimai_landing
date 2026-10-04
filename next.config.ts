@@ -3,6 +3,7 @@ import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 import { PHASE_PRODUCTION_BUILD } from "next/constants";
 import { DEFAULT_LOCALE, LOCALE_COOKIE, LOCALES } from "./src/i18n/config";
+import { BLOG_ENABLED } from "./src/lib/blog/types";
 import { assertBlogValid } from "./src/lib/blog/validate";
 
 const nextConfig: NextConfig = {
@@ -37,10 +38,20 @@ const nextConfig: NextConfig = {
         permanent: false,
       })),
       { source: "/", destination: `/${DEFAULT_LOCALE}`, permanent: false },
-      // Блог только на ru и kk (контракт бэкенда): английский интерфейс
-      // ведёт в русский блог.
-      { source: "/en/blog", destination: "/ru/blog", permanent: false },
-      { source: "/en/blog/:path*", destination: "/ru/blog/:path*", permanent: false },
+      ...(BLOG_ENABLED
+        ? [
+            // Блог только на ru и kk (контракт бэкенда): английский интерфейс
+            // ведёт в русский блог.
+            { source: "/en/blog", destination: "/ru/blog", permanent: false },
+            { source: "/en/blog/:path*", destination: "/ru/blog/:path*", permanent: false },
+          ]
+        : [
+            // Блог выключен: страницы собраны, но недоступны — временно (307)
+            // на главную языка.
+            { source: "/:lang(kk|ru|en)/blog", destination: "/:lang", permanent: false },
+            { source: "/:lang(kk|ru|en)/blog/:path*", destination: "/:lang", permanent: false },
+            { source: "/:lang(kk|ru)/feed.xml", destination: "/:lang", permanent: false },
+          ]),
     ];
   },
   images: {

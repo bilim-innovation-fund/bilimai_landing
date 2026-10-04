@@ -67,6 +67,7 @@ import {
 	HERO_EYEBROW,
 } from "@/content/landing"
 import { LANGUAGE_OPTIONS, LOCALE_COOKIE } from "@/i18n/config"
+import { BLOG_ENABLED } from "@/lib/blog/types"
 import { createTranslator } from "@/i18n/translate"
 
 const ASSET_ROOT = "/images/landing"
@@ -681,9 +682,11 @@ function Navigation() {
 					<a href='#faq' onClick={() => setOpen(false)}>
 						{t("Вопросы")}
 					</a>
-					<a href={blogUrl(language)} onClick={() => setOpen(false)}>
-						{t("Блог")}
-					</a>
+					{BLOG_ENABLED ? (
+						<a href={blogUrl(language)} onClick={() => setOpen(false)}>
+							{t("Блог")}
+						</a>
+					) : null}
 				</div>
 				<div className='nav-actions'>
 					<a
@@ -2313,7 +2316,9 @@ function Footer() {
 						<a href='#classes'>{t("Для классов")}</a>
 						<a href='#faq'>{t("Частые вопросы")}</a>
 						<a href={appUrl("/marketplace")}>{t("Галерея материалов")}</a>
-						<a href={blogUrl(language)}>{t("Блог")}</a>
+						{BLOG_ENABLED ? (
+							<a href={blogUrl(language)}>{t("Блог")}</a>
+						) : null}
 					</div>
 				</div>
 			</div>

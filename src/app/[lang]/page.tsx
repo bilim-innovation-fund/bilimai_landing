@@ -4,6 +4,7 @@ import Landing from "@/components/landing/Landing";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { hasLocale, LOCALES, OG_LOCALE } from "@/i18n/config";
 import { getDictionary, getMeta, getTranslator } from "@/i18n/dictionaries";
+import { BLOG_ENABLED } from "@/lib/blog/types";
 import { buildHomeGraph } from "@/lib/json-ld";
 import { SITE } from "@/lib/site";
 
@@ -28,7 +29,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         "x-default": SITE.root,
       },
       // Блог только на ru и kk: английская главная ссылается на русскую ленту.
-      types: { "application/rss+xml": `/${lang === "en" ? "ru" : lang}/feed.xml` },
+      ...(BLOG_ENABLED
+        ? { types: { "application/rss+xml": `/${lang === "en" ? "ru" : lang}/feed.xml` } }
+        : {}),
     },
     // images не задаём: их подставляет opengraph-image.tsx, а явный
     // openGraph.images отключил бы файловую конвенцию.

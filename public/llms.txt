@@ -36,7 +36,6 @@
 ## Key links
 
 - Website: https://bilimai.kz/kk · https://bilimai.kz/ru · https://bilimai.kz/en
-- Blog: https://bilimai.kz/ru/blog · https://bilimai.kz/kk/blog
 - Materials gallery: https://app.bilimai.kz/marketplace
 - Sign in (existing accounts): https://app.bilimai.kz/login
 - FAQ: https://bilimai.kz/ru#faq
