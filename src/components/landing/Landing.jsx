@@ -541,7 +541,7 @@ const rememberLanguage = (code) => {
 // Пункты — обычные ссылки на /kk, /ru, /en (полная загрузка документа
 // обновляет <html lang> и метаданные). Меню всегда в разметке, закрытое —
 // с hidden: так ссылки на языковые версии видны краулерам в SSR-HTML.
-function LanguageSwitcher() {
+function LanguageSwitcher({ onSelect }) {
 	const { language, t } = useI18n()
 	const [open, setOpen] = useState(false)
 	const rootRef = useRef(null)
@@ -583,6 +583,14 @@ function LanguageSwitcher() {
 		}
 	}, [open])
 
+	// Меню закрываем до ухода со страницы: иначе кнопка «Назад» достанет
+	// её из bfcache с открытым меню.
+	const choose = (code) => {
+		rememberLanguage(code)
+		setOpen(false)
+		onSelect?.()
+	}
+
 	return (
 		<div className='language-switcher' ref={rootRef}>
 			{/* Текущий язык — частью названия кнопки: aria-label перекрывает
@@ -591,7 +599,6 @@ function LanguageSwitcher() {
 			<button
 				className='language-switcher__trigger'
 				type='button'
-				aria-haspopup='true'
 				aria-expanded={open}
 				aria-controls={menuId}
 				aria-label={`${t("Выбрать язык")}: ${current.label}`}
@@ -619,7 +626,7 @@ function LanguageSwitcher() {
 						hrefLang={option.code}
 						lang={option.code}
 						aria-current={option.code === language ? "page" : undefined}
-						onClick={() => rememberLanguage(option.code)}
+						onClick={() => choose(option.code)}
 					>
 						<span>{option.label}</span>
 						<i>{option.short}</i>
@@ -676,7 +683,7 @@ function Navigation() {
 					>
 						{t("Войти")}
 					</a>
-					<LanguageSwitcher />
+					<LanguageSwitcher onSelect={() => setOpen(false)} />
 				</div>
 			</div>
 		</nav>

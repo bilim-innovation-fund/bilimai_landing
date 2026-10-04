@@ -41,6 +41,7 @@ export function websiteNode() {
     "@id": WEBSITE_ID,
     url: SITE.root,
     name: SITE.brand,
+    alternateName: SITE.alternateNames,
     inLanguage: SITE.languages,
     publisher: { "@id": ORG_ID },
   };

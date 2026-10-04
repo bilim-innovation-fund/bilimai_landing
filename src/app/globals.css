@@ -5054,15 +5054,20 @@ body.js [data-reveal]:not(.is-visible) {
   .language-switcher {
     width: 100%;
     margin-top: 10px;
+    flex-direction: column;
   }
 
   .language-switcher__trigger {
     justify-content: center;
   }
 
+  /* В бургер-панели (overflow: hidden) выпадающее меню обрезалось:
+     здесь оно в потоке и раздвигает панель. */
   .language-switcher__menu {
-    left: 0;
+    position: static;
     min-width: 0;
+    margin-top: 8px;
+    box-shadow: none;
   }
 
   .nav-actions .button {
