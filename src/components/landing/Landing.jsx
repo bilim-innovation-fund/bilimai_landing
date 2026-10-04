@@ -62,7 +62,6 @@ const geometricSequencesCover = `${ASSET_ROOT}/marketplace-lessons/geometric-seq
 const combinedEventsCover = `${ASSET_ROOT}/marketplace-lessons/combined-events.jpg`
 const graphingLinesCover = `${ASSET_ROOT}/marketplace-lessons/graphing-lines.jpg`
 
-const APP_ORIGIN = (process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "")
 // Env сервера лендинга нам недоступен, поэтому рабочие значения зашиты
 // фолбэками (как у WAITLIST_API_ENDPOINT ниже). Апекс — прод-сайт, поэтому
 // проверяем прод-сессию и уводим на прод-платформу; для дев-стенда задайте
@@ -77,9 +76,7 @@ const WAITLIST_PROXY_ENDPOINT = "/api/waitlist"
 const WAITLIST_API_ENDPOINT =
 	process.env.NEXT_PUBLIC_WAITLIST_API_URL ||
 	"https://api.dev.bilimai.kz/api/v1/auth/waitlist/"
-const appUrl = (path) => `${APP_ORIGIN}${path}`
-// Через PLATFORM_URL, а не appUrl: у appUrl основание APP_ORIGIN, и без
-// NEXT_PUBLIC_APP_URL оно пустое — ссылка молча уехала бы на сам лендинг.
+const appUrl = (path) => `${PLATFORM_URL}${path}`
 const LOGIN_URL = `${PLATFORM_URL}/login`
 const WHATSAPP_NUMBER_ERROR =
 	"Введите номер в международном формате, например +7 700 000 00 00."
@@ -2196,7 +2193,10 @@ const MARKETPLACE_LESSONS = [
 	},
 ]
 
-function MarketplaceLessonCard({ lesson, duplicate = false, linked = true }) {
+// Уроки в MARKETPLACE_LESSONS взяты из dev-базы и на проде не существуют,
+// поэтому по умолчанию карточки декоративные. Ссылки вернёт linked, когда
+// карточки перепривяжут к прод-урокам по UUID.
+function MarketplaceLessonCard({ lesson, duplicate = false, linked = false }) {
 	const { t } = useI18n()
 	const Card = linked ? "a" : "div"
 	const translatedTitle = t(lesson.title)
@@ -2317,6 +2317,7 @@ function Footer({ copyrightYear }) {
 						<a href='#workflow'>{t("Как работает")}</a>
 						<a href='#classes'>{t("Для классов")}</a>
 						<a href='#faq'>{t("Частые вопросы")}</a>
+						<a href={appUrl("/marketplace")}>{t("Галерея материалов")}</a>
 					</div>
 				</div>
 			</div>
