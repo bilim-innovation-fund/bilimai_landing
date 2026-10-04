@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { LOCALES } from "@/i18n/config";
 import { blogPath, getAllPosts, getTranslations, postPath } from "@/lib/blog/posts";
-import { BLOG_LOCALES } from "@/lib/blog/types";
+import { BLOG_ENABLED, BLOG_LOCALES } from "@/lib/blog/types";
 import { SITE } from "@/lib/site";
 
 // Корень "/" — редирект, в sitemap его нет. Яндекс hreflang из sitemap не
@@ -12,17 +12,18 @@ const LANGUAGE_ALTERNATES = {
 };
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const posts = getAllPosts();
-  const latest = (lang: string) =>
-    posts
-      .filter((post) => post.lang === lang)
-      .reduce<string>((max, post) => (post.updated > max ? post.updated : max), SITE.contentUpdatedAt);
-
   const home = LOCALES.map((lang) => ({
     url: `${SITE.origin}/${lang}`,
     lastModified: SITE.contentUpdatedAt,
     alternates: { languages: LANGUAGE_ALTERNATES },
   }));
+  if (!BLOG_ENABLED) return home;
+
+  const posts = getAllPosts();
+  const latest = (lang: string) =>
+    posts
+      .filter((post) => post.lang === lang)
+      .reduce<string>((max, post) => (post.updated > max ? post.updated : max), SITE.contentUpdatedAt);
 
   // Блог — только ru и kk.
   const blogAlternates = Object.fromEntries(
