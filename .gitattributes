@@ -1,0 +1,4 @@
+# Посты блога приходят из бэкенда в LF; на Windows (core.autocrlf=true)
+# без этого правила .mdx станут CRLF и локальная сборка упадёт.
+src/content/blog/**/*.mdx text eol=lf
+public/images/blog/** binary

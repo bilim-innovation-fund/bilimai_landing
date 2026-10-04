@@ -8701,3 +8701,381 @@ body.js [data-reveal]:not(.is-visible) {
   gap: 10px;
   margin-top: 10px;
 }
+
+/* Блог (src/app/[lang]/blog) ------------------------------------------ */
+.blog-nav__links {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  font-size: 14px;
+  font-weight: 560;
+}
+
+.blog-nav__links a,
+.blog-nav__languages a {
+  color: var(--muted);
+  transition: color 160ms ease;
+}
+
+.blog-nav__links a:hover,
+.blog-nav__languages a:hover,
+.blog-nav__links a[aria-current="page"],
+.blog-nav__languages a[aria-current="page"] {
+  color: var(--ink);
+}
+
+.blog-nav__aside {
+  display: flex;
+  justify-self: end;
+  align-items: center;
+  gap: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.blog-nav__languages {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.blog {
+  padding-top: 32px;
+  padding-bottom: 110px;
+}
+
+.blog-hero {
+  max-width: 760px;
+  margin: 24px 0 48px;
+}
+
+.blog-hero h1 {
+  font-size: clamp(40px, 5vw, 68px);
+  font-weight: 560;
+  letter-spacing: -0.048em;
+  line-height: 1;
+}
+
+.blog-hero p {
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.blog-empty {
+  color: var(--muted);
+  font-size: 17px;
+}
+
+.post-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 28px;
+}
+
+.post-card__link {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.post-card__link:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.post-card__cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1200 / 630;
+  object-fit: cover;
+}
+
+.post-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 22px 22px;
+}
+
+.post-card__body h2,
+.post-card__body h3 {
+  font-size: 21px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.post-card__body p {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.post-card__body .post-meta {
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+.post-category {
+  color: var(--brand-green);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.post-meta > :not(:first-child)::before {
+  margin-right: 10px;
+  color: #a3a8a5;
+  content: "·";
+}
+
+.post {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.post-breadcrumb {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 28px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.post-breadcrumb a:hover {
+  color: var(--ink);
+}
+
+.post-header h1 {
+  margin-top: 12px;
+  font-size: clamp(34px, 4.4vw, 54px);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+
+.post-lead {
+  margin-top: 18px;
+  color: #3f4441;
+  font-size: 19px;
+  line-height: 1.55;
+}
+
+.post-header .post-meta {
+  margin-top: 18px;
+}
+
+.post-cover {
+  margin: 32px 0 40px;
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
+.post-cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.prose {
+  color: #2b2f2d;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.prose > * + *,
+.post-summary > * + * {
+  margin-top: 1.1em;
+}
+
+.prose h2 {
+  margin-top: 2em;
+  font-size: 28px;
+  font-weight: 640;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  scroll-margin-top: 24px;
+}
+
+.prose h3 {
+  margin-top: 1.6em;
+  font-size: 22px;
+  font-weight: 640;
+  line-height: 1.25;
+}
+
+.prose a {
+  color: var(--brand-green);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.prose ul,
+.prose ol {
+  margin-bottom: 0;
+  padding-left: 1.3em;
+}
+
+.prose li + li {
+  margin-top: 0.4em;
+}
+
+.prose blockquote {
+  margin-inline: 0;
+  padding-left: 18px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+
+.prose code {
+  padding: 0.1em 0.35em;
+  border-radius: 6px;
+  background: var(--paper-deep);
+  font-size: 0.9em;
+}
+
+.prose pre {
+  overflow-x: auto;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--ink);
+  color: #e9ece8;
+  font-size: 14px;
+}
+
+.prose pre code {
+  padding: 0;
+  background: none;
+}
+
+.prose__table {
+  overflow-x: auto;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+
+.prose th,
+.prose td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose th {
+  font-weight: 650;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+/* Итог для учителя (rehype-summary.mjs): section, не aside — экстракторы
+   текста вырезают aside целиком. */
+.post-summary {
+  margin-top: 2.2em;
+  padding: 24px 26px 26px;
+  border-radius: var(--radius);
+  background: var(--purple-soft);
+}
+
+.prose .post-summary h2 {
+  margin-top: 0;
+}
+
+.callout {
+  padding: 18px 20px;
+  border-left: 3px solid var(--brand-green);
+  border-radius: 0 12px 12px 0;
+  background: #eef5f1;
+}
+
+.post-related {
+  max-width: 1080px;
+  margin: 72px auto 0;
+}
+
+.post-related > h2 {
+  margin-bottom: 24px;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.post-back {
+  max-width: 720px;
+  margin: 48px auto 0;
+  font-size: 15px;
+}
+
+.post-back a {
+  color: var(--brand-green);
+}
+
+.blog-footer .footer__links {
+  width: min(440px, 100%);
+  grid-template-columns: repeat(2, minmax(150px, 1fr));
+  gap: 32px;
+}
+
+.blog-footer .footer__links a[aria-current="page"] {
+  color: var(--brand-green);
+}
+
+@media (max-width: 760px) {
+  .blog-nav {
+    grid-template-columns: auto 1fr;
+  }
+
+  .blog-nav__links {
+    display: none;
+  }
+
+  .prose {
+    font-size: 17px;
+  }
+
+  .prose h2 {
+    font-size: 24px;
+  }
+
+  .post-lead {
+    font-size: 17px;
+  }
+
+  .post-summary {
+    padding: 20px;
+  }
+
+  .blog-footer .footer__links {
+    grid-template-columns: 1fr 1fr;
+    justify-self: start;
+  }
+}

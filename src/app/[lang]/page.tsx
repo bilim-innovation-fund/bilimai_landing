@@ -27,6 +27,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         en: "/en",
         "x-default": SITE.root,
       },
+      // Блог только на ru и kk: английская главная ссылается на русскую ленту.
+      types: { "application/rss+xml": `/${lang === "en" ? "ru" : lang}/feed.xml` },
     },
     // images не задаём: их подставляет opengraph-image.tsx, а явный
     // openGraph.images отключил бы файловую конвенцию.

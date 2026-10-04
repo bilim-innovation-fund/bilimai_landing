@@ -88,6 +88,8 @@ const WAITLIST_API_ENDPOINT =
 	"https://api.dev.bilimai.kz/api/v1/auth/waitlist/"
 const appUrl = (path) => `${PLATFORM_URL}${path}`
 const LOGIN_URL = `${PLATFORM_URL}/login`
+// Блог только на ru и kk: с английской версии ведём в русский.
+const blogUrl = (language) => `/${language === "en" ? "ru" : language}/blog`
 const WHATSAPP_NUMBER_ERROR =
 	"Введите номер в международном формате, например +7 700 000 00 00."
 
@@ -645,7 +647,7 @@ function LanguageSwitcher({ onSelect }) {
 
 function Navigation() {
 	const [open, setOpen] = useState(false)
-	const { t } = useI18n()
+	const { language, t } = useI18n()
 
 	useEffect(() => {
 		const close = () => setOpen(false)
@@ -678,6 +680,9 @@ function Navigation() {
 					</a>
 					<a href='#faq' onClick={() => setOpen(false)}>
 						{t("Вопросы")}
+					</a>
+					<a href={blogUrl(language)} onClick={() => setOpen(false)}>
+						{t("Блог")}
 					</a>
 				</div>
 				<div className='nav-actions'>
@@ -2289,7 +2294,7 @@ function FinalCta({ onWaitlistOpen }) {
 }
 
 function Footer() {
-	const { t } = useI18n()
+	const { language, t } = useI18n()
 	return (
 		<footer className='footer section-pad'>
 			<div className='footer__top'>
@@ -2305,6 +2310,7 @@ function Footer() {
 						<a href='#classes'>{t("Для классов")}</a>
 						<a href='#faq'>{t("Частые вопросы")}</a>
 						<a href={appUrl("/marketplace")}>{t("Галерея материалов")}</a>
+						<a href={blogUrl(language)}>{t("Блог")}</a>
 					</div>
 				</div>
 			</div>

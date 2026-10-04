@@ -1,5 +1,9 @@
+import path from "node:path";
+import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
+import { PHASE_PRODUCTION_BUILD } from "next/constants";
 import { DEFAULT_LOCALE, LOCALE_COOKIE, LOCALES } from "./src/i18n/config";
+import { assertBlogValid } from "./src/lib/blog/validate";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
@@ -33,6 +37,10 @@ const nextConfig: NextConfig = {
         permanent: false,
       })),
       { source: "/", destination: `/${DEFAULT_LOCALE}`, permanent: false },
+      // Блог только на ru и kk (контракт бэкенда): английский интерфейс
+      // ведёт в русский блог.
+      { source: "/en/blog", destination: "/ru/blog", permanent: false },
+      { source: "/en/blog/:path*", destination: "/ru/blog/:path*", permanent: false },
     ];
   },
   images: {
@@ -69,4 +77,22 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Плагины MDX — строками (Turbopack не передаёт функции в Rust). Свой
+// плагин — абсолютным путём: @next/mdx резолвит строки от папки MDX-файла.
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: ["remark-frontmatter", "remark-gfm"],
+    rehypePlugins: ["rehype-slug", path.resolve("src/lib/blog/rehype-summary.mjs")],
+  },
+});
+
+export default function config(phase: string): NextConfig {
+  // Валидатор блога — до компиляции MDX: иначе сырой «{» в посте уронит
+  // сборку непонятной ошибкой компилятора. Конфиг читается и воркерами
+  // сборки — флаг в env, чтобы предупреждения не печатались повторно.
+  if (phase === PHASE_PRODUCTION_BUILD && !process.env.BILIM_BLOG_VALIDATED) {
+    assertBlogValid(process.cwd());
+    process.env.BILIM_BLOG_VALIDATED = "1";
+  }
+  return withMDX(nextConfig);
+}
