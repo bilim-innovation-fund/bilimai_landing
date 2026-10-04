@@ -20,7 +20,7 @@ const kk = {
 		"Оқу бағдарламасына сай жоспар құрыңыз, ЖИ көмегімен сабақтар мен тесттер дайындаңыз, сыныптарды басқарыңыз — Bilim AI оқу жұмысының барлығын бір жерге жинайды",
 	"Посмотреть возможности": "Мүмкіндіктерді көру",
 	"Начать": "Бастау",
-	"Партнёры Bilim AI": "Bilim AI серіктестері",
+	"Нам доверяют": "Бізге сенеді",
 
 	"Закрыть": "Жабу",
 	"Заявка принята": "Өтінім қабылданды",
@@ -258,7 +258,7 @@ const en = {
 		"Plan around the curriculum, create lessons and tests with AI, and manage classes — Bilim AI connects the entire learning process in one place",
 	"Посмотреть возможности": "Explore features",
 	"Начать": "Get started",
-	"Партнёры Bilim AI": "Bilim AI partners",
+	"Нам доверяют": "Trusted by",
 
 	"Закрыть": "Close",
 	"Заявка принята": "Request received",

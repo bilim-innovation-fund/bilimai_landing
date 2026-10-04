@@ -575,6 +575,25 @@ body.js [data-reveal]:not(.is-visible) {
   from { transform: translateY(100%); }
 }
 
+/* Навигация вынесена из .hero в <header class="site-header">: та же сетка
+   фона, чтобы полоса меню выглядела как раньше. */
+.site-header {
+  position: relative;
+}
+
+.site-header::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background-image: url("/images/landing/intro-grid.svg");
+  background-position: left top;
+  background-repeat: repeat;
+  background-size: 88px auto;
+  content: "";
+  opacity: 0.03;
+  pointer-events: none;
+}
+
 .hero {
   position: relative;
   overflow: hidden;
@@ -1195,6 +1214,16 @@ body.js [data-reveal]:not(.is-visible) {
   position: relative;
   overflow: hidden;
   background: transparent;
+}
+
+.partner-marquee__title {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .partner-marquee__viewport {
@@ -3052,6 +3081,13 @@ body.js [data-reveal]:not(.is-visible) {
   cursor: pointer;
 }
 
+/* Вопрос — h3 для структуры документа, выглядит как прежний span. */
+.faq summary h3 {
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
 .faq summary::-webkit-details-marker {
   display: none;
 }
@@ -3248,6 +3284,17 @@ body.js [data-reveal]:not(.is-visible) {
 .platform-overview {
   padding-top: 72px;
   padding-bottom: 180px;
+}
+
+.platform-overview__heading {
+  margin-bottom: 40px;
+}
+
+.platform-overview__heading h2 {
+  font-size: clamp(32px, 3.4vw, 48px);
+  font-weight: 560;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
 }
 
 .platform-pillars {

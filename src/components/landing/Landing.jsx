@@ -1199,8 +1199,7 @@ function FloatingLibrary() {
 function Hero({ onWaitlistOpen }) {
 	const { t } = useI18n()
 	return (
-		<header className='hero' id='top'>
-			<Navigation />
+		<section className='hero' aria-labelledby='hero-title'>
 			<div className='hero-stage'>
 				<FloatingCombinedEventsLesson />
 				<FloatingPlan />
@@ -1214,7 +1213,7 @@ function Hero({ onWaitlistOpen }) {
 						<span className='eyebrow__accent'>{t("Скоро!")}</span>
 						<span>{t("Платформа в разработке")}</span>
 					</div>
-					<h1>
+					<h1 id='hero-title'>
 						<span>{t("Единое пространство")}</span>{" "}
 						{t("для современного учебного процесса")}
 					</h1>
@@ -1253,7 +1252,7 @@ function Hero({ onWaitlistOpen }) {
 					</a>
 				</div>
 			</div>
-		</header>
+		</section>
 	)
 }
 
@@ -1301,8 +1300,11 @@ function PartnerMarquee() {
 	return (
 		<section
 			className='partner-marquee section-pad'
-			aria-label={t("Партнёры Bilim AI")}
+			aria-labelledby='partners-title'
 		>
+			<h2 className='partner-marquee__title' id='partners-title'>
+				{t("Нам доверяют")}
+			</h2>
 			<div className='partner-marquee__viewport'>
 				<div className='partner-marquee__track'>
 					<PartnerGroup />
@@ -1497,8 +1499,11 @@ function PlatformOverview() {
 		<section
 			className='platform-overview section-pad'
 			id='product'
-			aria-label={t("Возможности Bilim AI")}
+			aria-labelledby='product-title'
 		>
+			<div className='platform-overview__heading' data-reveal>
+				<h2 id='product-title'>{t("Возможности Bilim AI")}</h2>
+			</div>
 			<div className='platform-pillars'>
 				{PLATFORM_PILLARS.map((pillar, index) => (
 					<article
@@ -1965,9 +1970,13 @@ function SecondaryFeatures() {
 function FAQ() {
 	const { t } = useI18n()
 	return (
-		<section className='faq section-pad' id='faq'>
+		<section
+			className='faq section-pad'
+			id='faq'
+			aria-labelledby='faq-title'
+		>
 			<div className='faq__intro' data-reveal>
-				<h2>{t("Остались вопросы?")}</h2>
+				<h2 id='faq-title'>{t("Остались вопросы?")}</h2>
 			</div>
 			<div
 				className='faq__list'
@@ -1977,8 +1986,8 @@ function FAQ() {
 				{FAQ_ITEMS.map(([question, answer], index) => (
 					<details key={question} open={index === 0}>
 						<summary>
-							<span>{t(question)}</span>
-							<ChevronDown size={20} />
+							<h3>{t(question)}</h3>
+							<ChevronDown size={20} aria-hidden='true' />
 						</summary>
 						<p>{t(answer)}</p>
 					</details>
@@ -2316,8 +2325,11 @@ export default function App({ lang, messages }) {
 
 	return (
 		<LanguageContext.Provider value={i18n}>
-			<Hero onWaitlistOpen={() => setWaitlistOpen(true)} />
-			<main>
+			<header className='site-header' id='top'>
+				<Navigation />
+			</header>
+			<main id='main'>
+				<Hero onWaitlistOpen={() => setWaitlistOpen(true)} />
 				<PlatformOverview />
 				<PartnerMarquee />
 				<SecondaryFeatures />
