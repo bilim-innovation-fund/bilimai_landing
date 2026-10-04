@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { BlogFooter, BlogHeader, postLanguages } from "@/components/blog/BlogChrome";
 import { CategoryLabel, PostCard, PostMeta } from "@/components/blog/PostParts";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { AUTHORS } from "@/content/authors";
@@ -95,51 +96,56 @@ export default async function PostPage({ params }: Props) {
   const Body = await loadBody(post.lang, post.slug);
   const ui = BLOG_UI[post.lang];
   const related = getRelated(post);
+  const languages = postLanguages(post, getTranslations(post.group));
 
   return (
     <>
-      <JsonLd data={buildPostGraph(post)} />
-      <article className="post">
-        <nav className="post-breadcrumb" aria-label={ui.blog}>
-          <a href={`/${post.lang}`}>{ui.home}</a>
-          <span aria-hidden="true">/</span>
-          <a href={blogPath(post.lang)}>{ui.blog}</a>
-        </nav>
-        <header className="post-header">
-          <CategoryLabel post={post} />
-          <h1>{post.title}</h1>
-          <p className="post-lead">{post.description}</p>
-          <PostMeta post={post} />
-        </header>
-        {/* LCP-кандидат: eager + fetchPriority, без preload/priority. */}
-        <div className="post-cover">
-          <Image
-            src={post.cover}
-            alt={post.coverAlt}
-            width={1200}
-            height={630}
-            sizes="(max-width: 760px) 100vw, 720px"
-            loading="eager"
-            fetchPriority="high"
-          />
-        </div>
-        <div className="prose">
-          <Body />
-        </div>
-      </article>
-      {related.length ? (
-        <section className="post-related" aria-labelledby="related-title">
-          <h2 id="related-title">{ui.related}</h2>
-          <div className="post-grid">
-            {related.map((other) => (
-              <PostCard post={other} heading="h3" key={other.slug} />
-            ))}
+      <BlogHeader lang={post.lang} languages={languages} isIndex={false} />
+      <main id="main" className="blog section-pad">
+        <JsonLd data={buildPostGraph(post)} />
+        <article className="post">
+          <nav className="post-breadcrumb" aria-label={ui.breadcrumb}>
+            <a href={`/${post.lang}`}>{ui.home}</a>
+            <span aria-hidden="true">/</span>
+            <a href={blogPath(post.lang)}>{ui.blog}</a>
+          </nav>
+          <header className="post-header">
+            <CategoryLabel post={post} />
+            <h1>{post.title}</h1>
+            <p className="post-lead">{post.description}</p>
+            <PostMeta post={post} />
+          </header>
+          {/* LCP-кандидат: eager + fetchPriority, без preload/priority. */}
+          <div className="post-cover">
+            <Image
+              src={post.cover}
+              alt={post.coverAlt}
+              width={1200}
+              height={630}
+              sizes="(max-width: 760px) 100vw, 720px"
+              loading="eager"
+              fetchPriority="high"
+            />
           </div>
-        </section>
-      ) : null}
-      <p className="post-back">
-        <a href={blogPath(post.lang)}>← {ui.allPosts}</a>
-      </p>
+          <div className="prose">
+            <Body />
+          </div>
+        </article>
+        {related.length ? (
+          <section className="post-related" aria-labelledby="related-title">
+            <h2 id="related-title">{ui.related}</h2>
+            <div className="post-grid">
+              {related.map((other) => (
+                <PostCard post={other} heading="h3" key={other.slug} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+        <p className="post-back">
+          <a href={blogPath(post.lang)}>← {ui.allPosts}</a>
+        </p>
+      </main>
+      <BlogFooter lang={post.lang} languages={languages} />
     </>
   );
 }

@@ -30,7 +30,15 @@ export function CategoryLabel({ post }: { post: Post }) {
 }
 
 // В индексе блога заголовок карточки — h2, в «Читайте также» под постом — h3.
-export function PostCard({ post, heading = "h2" }: { post: Post; heading?: "h2" | "h3" }) {
+export function PostCard({
+  post,
+  heading = "h2",
+  eager = false,
+}: {
+  post: Post;
+  heading?: "h2" | "h3";
+  eager?: boolean;
+}) {
   const Heading = heading;
   return (
     <article className="post-card">
@@ -42,6 +50,8 @@ export function PostCard({ post, heading = "h2" }: { post: Post; heading?: "h2" 
             width={1200}
             height={630}
             sizes="(max-width: 760px) 100vw, (max-width: 1180px) 50vw, 400px"
+            loading={eager ? "eager" : "lazy"}
+            fetchPriority={eager ? "high" : undefined}
           />
         </div>
         <div className="post-card__body">

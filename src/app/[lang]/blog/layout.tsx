@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
-import { BlogFooter, BlogHeader } from "@/components/blog/BlogChrome";
 import { isBlogLocale } from "@/lib/blog/types";
 
 // Блог только на ru и kk. /en/blog тоже пререндерится (kk|ru|en приходят из
 // корневого layout), но в рантайме его перехватывает редирект на /ru/blog
-// в next.config.ts.
+// в next.config.ts. Шапку и подвал рендерят страницы: языковые ссылки у
+// поста ведут на его перевод, а layout не знает slug.
 export default async function BlogLayout({
   children,
   params,
@@ -15,13 +15,5 @@ export default async function BlogLayout({
   const { lang } = await params;
   if (!isBlogLocale(lang)) notFound();
 
-  return (
-    <>
-      <BlogHeader lang={lang} />
-      <main id="main" className="blog section-pad">
-        {children}
-      </main>
-      <BlogFooter lang={lang} />
-    </>
-  );
+  return children;
 }

@@ -20,6 +20,8 @@ export const BLOG_UI: Record<
     login: string;
     language: string;
     footer: string;
+    mainNav: string;
+    breadcrumb: string;
   }
 > = {
   ru: {
@@ -39,6 +41,8 @@ export const BLOG_UI: Record<
     login: "Войти",
     language: "Язык",
     footer: "ИИ-платформа для учителей Казахстана.",
+    mainNav: "Основная навигация",
+    breadcrumb: "Навигационная цепочка",
   },
   kk: {
     blog: "Блог",
@@ -57,6 +61,8 @@ export const BLOG_UI: Record<
     login: "Кіру",
     language: "Тіл",
     footer: "Қазақстан мұғалімдеріне арналған ЖИ платформасы.",
+    mainNav: "Негізгі навигация",
+    breadcrumb: "Навигациялық тізбек",
   },
 };
 

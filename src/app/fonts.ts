@@ -1,7 +1,9 @@
 import localFont from "next/font/local";
 
-// Локальный файл, а не next/font/google: у Geist из Google Fonts нет
-// subset cyrillic-ext, и казахские Ә Қ Ң Ө Ұ Ү Һ Ғ ушли бы в fallback.
+// Локальный файл, а не next/font/google: шрифт зафиксирован в репозитории,
+// и сборка не ходит в Google Fonts. (У Geist из Google subset cyrillic-ext
+// есть; при переходе добавить его в subsets, иначе казахские начертания не
+// попадут в preload.)
 export const geist = localFont({
   src: "../assets/fonts/Geist-Variable.woff2",
   weight: "100 900",

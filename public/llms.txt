@@ -1,6 +1,6 @@
 # Bilim AI
 
-> Bilim AI is an AI platform for school teachers in Kazakhstan. Teachers use it to generate curriculum plans (ҰМЖ, ОМЖ, КТЖ, ҚМЖ), lessons and slides, and formative and summative assessments (БЖБ/СОР and ТЖБ/СОЧ), including grading paper answer sheets from a photo — in Kazakh, Russian and English.
+> Bilim AI is an AI platform for school teachers in Kazakhstan. Teachers use it to generate curriculum plans (ҰМЖ, ОМЖ, КТЖ, ҚМЖ), lessons and slides, and unit and term summative assessments (БЖБ/СОР and ТЖБ/СОЧ), including grading paper answer sheets from a photo — in Kazakh, Russian and English.
 
 ## What Bilim AI is
 

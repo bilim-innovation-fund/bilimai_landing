@@ -10,6 +10,11 @@ export type LocaleMeta = {
   og: { headline: string; tagline: string; footer: string };
 };
 
+// Версия текстов OG-картинки. Менять вместе с комментарием og-rev в
+// src/app/[lang]/opengraph-image.tsx: индекс блога ссылается на картинку
+// явно (?v=OG_REV), без хеша, который Next считает по файлу картинки.
+export const OG_REV = "2026-10-05";
+
 export const META: Record<Locale, LocaleMeta> = {
   kk: {
     title: "ҚМЖ, БЖБ және ТЖБ — мұғалімдерге арналған ЖИ | Bilim AI",

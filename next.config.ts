@@ -46,9 +46,18 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
     qualities: [75],
+    // 31 день вместо 4 часов по умолчанию: обложки блога названы по хешу
+    // содержимого, статические импорты и так immutable. Каждый промах кэша —
+    // платная трансформация на Vercel, а AVIF и WebP считаются отдельно.
+    minimumCacheTTL: 2678400,
   },
   async headers() {
     return [
+      {
+        // cover-<hash8>.jpg: новая обложка — новое имя файла.
+        source: "/images/blog/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
       {
         // llms.txt — для LLM-агентов, а не для поисковой выдачи.
         source: "/llms.txt",

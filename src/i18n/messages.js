@@ -24,8 +24,7 @@ const kk = {
 	"Закрыть": "Жабу",
 	"Заявка принята": "Өтінім қабылданды",
 	"Вы в списке ожидания": "Сіз күту тізіміндесіз",
-	"Свяжемся с вами в WhatsApp, когда Bilim AI будет готов к раннему доступу.":
-		"Bilim AI ерте қолжетімділікке дайын болғанда, сізге WhatsApp арқылы хабарласамыз.",
+	"Свяжемся с вами в WhatsApp, когда откроем доступ.": "Қолжетімділікті ашқанда, сізге WhatsApp арқылы хабарласамыз.",
 	"Готово": "Дайын",
 	"Ранний доступ": "Ерте қолжетімділік",
 	"Откройте Bilim AI первыми": "Bilim AI-ды алғашқылардың бірі болып қолданыңыз",
@@ -273,8 +272,7 @@ const en = {
 	"Закрыть": "Close",
 	"Заявка принята": "Request received",
 	"Вы в списке ожидания": "You’re on the waitlist",
-	"Свяжемся с вами в WhatsApp, когда Bilim AI будет готов к раннему доступу.":
-		"We’ll contact you on WhatsApp when Bilim AI is ready for early access.",
+	"Свяжемся с вами в WhatsApp, когда откроем доступ.": "We’ll contact you on WhatsApp when access opens.",
 	"Готово": "Done",
 	"Ранний доступ": "Early access",
 	"Откройте Bilim AI первыми": "Be among the first to use Bilim AI",
@@ -414,7 +412,7 @@ const en = {
 		"Start with the answers here — or open Bilim AI and create your first resource.",
 	"Что такое Bilim AI?": "What is Bilim AI?",
 	"Bilim AI — это ИИ-платформа для учителей Казахстана, которая объединяет планирование по обновлённой программе, создание уроков и тестов и аналитику класса. Она помогает готовить ҰМЖ, ОМЖ, КТЖ и ҚМЖ (ДСП, ССП, КТП, КСП), уроки и презентации, БЖБ и ТЖБ (СОР и СОЧ) на казахском, русском и английском, проверять работы по фото и видеть результаты каждого ученика в одном пространстве.":
-		"Bilim AI is an AI platform for teachers in Kazakhstan that brings curriculum-aligned planning, lesson and test creation, and class analytics into one workspace. It helps prepare long-, medium-, calendar- and short-term plans (ҰМЖ, ОМЖ, КТЖ, ҚМЖ), lessons and presentations, and unit and term summative assessments (БЖБ/ТЖБ, СОР/СОЧ) in Kazakh, Russian and English, grade paper work from photos, and see every student's results in one place.",
+		"Bilim AI is an AI platform for teachers in Kazakhstan that brings curriculum-aligned planning, lesson and test creation, and class analytics into one workspace. It helps prepare long-term, medium-term, calendar-thematic and short-term plans (ҰМЖ, ОМЖ, КТЖ, ҚМЖ), lessons and presentations, and unit and term summative assessments (БЖБ/ТЖБ, СОР/СОЧ) in Kazakh, Russian and English, grade paper work from photos, and see every student's results in one place.",
 	"Для кого Bilim AI?": "Who is Bilim AI for?",
 	"Для учителей школ Казахстана — предметников, классных руководителей и завучей, — а также для школ и учебных центров, которым нужна единая среда для планирования, уроков, оценивания и аналитики. Bilim AI работает с обновлённой программой и на трёх языках обучения.":
 		"For school teachers in Kazakhstan — subject teachers, homeroom teachers and heads of studies — as well as schools and learning centres that need one environment for planning, lessons, assessment and analytics. Bilim AI works with the updated national curriculum and in all three languages of instruction.",

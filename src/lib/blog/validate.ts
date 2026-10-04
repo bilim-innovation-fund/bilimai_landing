@@ -39,7 +39,8 @@ import {
 export const CONTENT_DIR = "src/content/blog";
 export const PUBLIC_DIR = "public";
 export const COVER_DIR = "public/images/blog";
-export const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+// Как Django SlugField (apps/blog/models.py): slug можно поправить в админке.
+export const SLUG_RE = /^[A-Za-z0-9_-]+$/;
 
 export type Issue = {
   level: "error" | "warning";
@@ -65,9 +66,11 @@ const HTML_TAG_RE = /<\/?[a-zA-Z][^>]*>/;
 const LT_RE = /<(?![ \t\r\n])/;
 const CODE_RE = /(^```[\s\S]*?^```[ \t]*$|`[^`\n]+`)/m;
 const UNRESOLVED_TOKEN_RE = /\{\{feature:/;
-// Ссылка внутри текста ссылки: в lint это «токен внутри [..]», в выгрузке
-// токены уже ссылки, поэтому ищем вложенную ссылку.
-const NESTED_LINK_RE = /\[[^\]\n]*\[[^\]\n]*\]\([^)\s]*\)[^\]\n]*\]\(/;
+// Бывшие токены {{feature:…}}: бандл превращает их в ссылки на
+// app.bilimai.kz. Lint проверяет текст без токенов — здесь их вырезаем так же.
+const FORMER_TOKEN_RE = /\[[^\]\n]*\]\(\s*<?https?:\/\/app\.bilimai\.kz[^)\s]*>?\s*\)/gi;
+// Как _TOKEN_IN_LINK_TEXT_RE (`\[[^\]\n]*\{\{feature:`): «[» без «]», а за ним токен.
+const TOKEN_IN_LINK_TEXT_RE = /\[[^\]\n]*\[[^\]\n]*\]\(\s*<?https?:\/\/app\.bilimai\.kz/i;
 const LINK_DEST_RE = /\]\(\s*<?([^)\s>]+)/g;
 const REF_DEF_RE = /^\s{0,3}\[[^\]]+\]:\s*<?(\S+?)>?\s*$/gm;
 const BARE_URL_RE = new RegExp(
@@ -143,17 +146,26 @@ function normalizeUrl(url: string): string {
   return url;
 }
 
+// Разбор как urllib.parse.urlsplit (lint._link_ok), а не WHATWG URL: тот
+// считает «\» разделителем и пропускает `https://bilimai.kz\@evil.com`.
+function urlsplit(url: string): { scheme: string; host: string } | undefined {
+  const m = /^([A-Za-z][A-Za-z0-9+.-]*):([\s\S]*)$/.exec(url.replace(/[\t\r\n]/g, ""));
+  if (!m) return undefined;
+  const rest = m[2];
+  if (!rest.startsWith("//")) return { scheme: m[1].toLowerCase(), host: "" };
+  const netloc = rest.slice(2).split(/[/?#]/, 1)[0];
+  let host = netloc.slice(netloc.lastIndexOf("@") + 1);
+  host = host.startsWith("[") ? host.slice(1, host.indexOf("]")) : host.split(":")[0];
+  return { scheme: m[1].toLowerCase(), host: host.toLowerCase() };
+}
+
 export function linkOk(url: string): boolean {
-  let parsed: URL;
-  try {
-    parsed = new URL(normalizeUrl(url));
-  } catch {
-    // Относительная ссылка или мусор — в контракте запрещены.
-    return false;
-  }
-  const host = parsed.hostname.toLowerCase();
+  const parts = urlsplit(normalizeUrl(url));
+  // Относительная ссылка или мусор — в контракте запрещены.
+  if (!parts) return false;
+  const { scheme, host } = parts;
   return (
-    (parsed.protocol === "http:" || parsed.protocol === "https:") &&
+    (scheme === "http" || scheme === "https") &&
     ALLOWED_HOSTS.some((h) => host === h || host.endsWith(`.${h}`))
   );
 }
@@ -253,7 +265,9 @@ function lineAt(post: PostFile, index: number): number {
 }
 
 function lintBody(post: PostFile, report: Report) {
-  const { file, lang, text } = post;
+  const { file, lang } = post;
+  // JS считает U+2028/U+2029 концом строки для ^ и $, Python — нет.
+  const text = post.text.replace(/[\u2028\u2029]/g, " ");
   const at = (index: number) => lineAt(post, index);
   if (!text.trim()) {
     report.error(file, "пустое тело");
@@ -262,7 +276,7 @@ function lintBody(post: PostFile, report: Report) {
   const h1 = H1_RE.exec(text);
   if (h1) report.error(file, "заголовок первого уровня «# » — заголовок берётся из title", at(h1.index));
 
-  const stripped = stripCode(text);
+  const stripped = stripCode(text).replace(FORMER_TOKEN_RE, "");
   // Индексы в stripped не совпадают с text — ищем место по фрагменту.
   const locate = (fragment: string) => {
     const i = text.indexOf(fragment);
@@ -300,16 +314,31 @@ function lintBody(post: PostFile, report: Report) {
       );
     }
   }
-  const nested = NESTED_LINK_RE.exec(stripped);
-  if (nested) report.error(file, "ссылка внутри текста ссылки [..] — вложенная ссылка", locate(nested[0]));
-  for (const { url } of linkTargets(stripped)) {
+  const nested = TOKEN_IN_LINK_TEXT_RE.exec(text);
+  if (nested) {
+    report.error(
+      file,
+      "ссылка на функцию продукта внутри текста ссылки [..] — получится вложенная ссылка",
+      locate(nested[0]),
+    );
+  }
+  for (const { url } of linkTargets(stripCode(text))) {
     if (!linkOk(url)) {
       report.error(
         file,
-        `ссылка вне allow-list (https://bilimai.kz, https://app.bilimai.kz) или без https://: ${url}`,
+        `ссылка вне allow-list (bilimai.kz, app.bilimai.kz) или относительная: ${url}`,
         locate(url),
       );
     }
+  }
+  const escapedInCode = splitCode(text).some(
+    (part, i) => i % 2 === 1 && /(^|[^\\])(\\\\)*\\[{}<]/.test(part),
+  );
+  if (escapedInCode) {
+    report.warn(
+      file,
+      "в коде экранированные «\\{ \\} \\<» — вероятно, тело в админке с CRLF; проверьте, как код выглядит на странице",
+    );
   }
   if (!H2_RE.test(text)) report.warn(file, "нет ни одного подзаголовка «## »");
 
@@ -383,6 +412,7 @@ function lintMeta(post: PostFile, report: Report) {
     report.error(file, `group «${fm.group}» не совпадает со slug из пути «${post.slug}»`, keyLines.group);
   }
   if (!fm.coverAlt.trim()) report.warn(file, "пустой coverAlt", keyLines.coverAlt);
+  if (fm.draft) report.warn(file, "draft: true — пост не попадёт в прод-сборку", keyLines.draft);
 }
 
 function lintCover(root: string, post: PostFile, report: Report) {
@@ -452,7 +482,7 @@ function lintPair(ru: PostFile, kk: PostFile, report: Report) {
 // Ссылка https://bilimai.kz/{ru,kk}/blog/<slug> на несуществующий пост.
 function lintBlogLinks(post: PostFile, existing: Set<string>, report: Report) {
   for (const { url } of linkTargets(stripCode(post.text))) {
-    const m = BLOG_LINK_RE.exec(url);
+    const m = BLOG_LINK_RE.exec(url.replace(/[.,;:!?…]+$/, ""));
     if (!m) continue;
     const lang = m[1].toLowerCase() === "en" ? "ru" : m[1].toLowerCase();
     if (!existing.has(`${lang}/${m[2]}`)) {
@@ -471,7 +501,7 @@ function readPosts(root: string, report: Report): PostFile[] {
       const file = `${CONTENT_DIR}/${lang}/${name}`;
       const slug = name.slice(0, -".mdx".length);
       if (!SLUG_RE.test(slug)) {
-        report.error(file, `slug «${slug}»: только a-z, 0-9 и дефисы`);
+        report.error(file, `slug «${slug}»: только латиница, цифры, «-» и «_» (как SlugField)`);
         continue;
       }
       try {
@@ -514,7 +544,10 @@ function lintOrphans(root: string, posts: PostFile[], report: Report) {
 export function validateBlog(root: string): Issue[] {
   const report = new Report();
   const posts = readPosts(root, report);
-  const existing = new Set(posts.map((post) => `${post.lang}/${post.slug}`));
+  // Черновик в прод-сборку не попадает: ссылка на него — тоже 404.
+  const existing = new Set(
+    posts.filter((post) => !post.fm.draft).map((post) => `${post.lang}/${post.slug}`),
+  );
   for (const post of posts) {
     lintMeta(post, report);
     lintBody(post, report);

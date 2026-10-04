@@ -4,7 +4,7 @@ import { ImageResponse } from "next/og";
 import { hasLocale, LOCALES } from "@/i18n/config";
 import { META } from "@/i18n/meta";
 
-// og-rev: 2026-10-05
+// og-rev: 2026-10-05 (то же значение — OG_REV в src/i18n/meta.ts)
 // Хеш в URL картинки считается только по этому файлу. При правке текстов
 // og в src/i18n/meta.ts менять дату выше — иначе мессенджеры покажут
 // закэшированное старое превью.

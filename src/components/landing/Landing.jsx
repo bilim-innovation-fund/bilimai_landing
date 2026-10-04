@@ -379,7 +379,7 @@ function WaitlistModal({ open, onClose }) {
 						<h2 id='waitlist-title'>{t("Вы в списке ожидания")}</h2>
 						<p>
 							{t(
-								"Свяжемся с вами в WhatsApp, когда Bilim AI будет готов к раннему доступу.",
+								"Свяжемся с вами в WhatsApp, когда откроем доступ.",
 							)}
 						</p>
 						<button
@@ -1303,7 +1303,8 @@ function PartnerGroup({ duplicate = false }) {
 					<NextImage
 						src={partner.logo}
 						alt={duplicate ? "" : partner.name}
-						sizes='220px'
+						// Ширина логотипа в ленте — --partner-width (квадратные — 64px).
+						sizes={partner.width}
 						loading='lazy'
 					/>
 				</div>
@@ -1520,7 +1521,9 @@ function About() {
 			id='about'
 			aria-labelledby='about-title'
 		>
-			<div className='about__inner' data-reveal>
+			{/* Без data-reveal: на телефонах капсула попадает в первый экран и
+			    может быть LCP — она не должна ждать JS. */}
+			<div className='about__inner'>
 				<h2 id='about-title'>{t(ABOUT_TITLE)}</h2>
 				<p>{t(ABOUT_CAPSULE)}</p>
 			</div>

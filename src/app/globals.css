@@ -8739,6 +8739,29 @@ body.js [data-reveal]:not(.is-visible) {
   font-size: 13px;
 }
 
+/* На узких экранах — короткие коды языков, иначе шапка не влезает в 320px. */
+.blog-lang__short {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  .blog-lang__long {
+    display: none;
+  }
+
+  .blog-lang__short {
+    display: inline;
+  }
+
+  .blog-nav__aside {
+    gap: 12px;
+  }
+
+  .blog-nav__languages {
+    gap: 8px;
+  }
+}
+
 .blog {
   padding-top: 32px;
   padding-bottom: 110px;

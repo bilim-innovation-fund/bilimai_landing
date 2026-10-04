@@ -105,7 +105,7 @@
 - `generateStaticParams` объявлен в самом файле: image-маршруты не наследуют параметры сегмента;
 - PNG ≈ 65 КБ при лимите WhatsApp 300 КБ.
 
-- **Хеш в URL картинки считается только по этому файлу.** При правке текстов `og` в `meta.ts` обновите дату в комментарии `// og-rev: …` — иначе мессенджеры покажут закэшированное старое превью.
+- **Хеш в URL картинки считается только по этому файлу.** При правке текстов `og` в `meta.ts` обновите дату в комментарии `// og-rev: …` и константу `OG_REV` в `meta.ts` — иначе мессенджеры покажут закэшированное старое превью. Индекс блога ссылается на картинку явно (`/<lang>/opengraph-image?v=<OG_REV>`), без хеша Next, поэтому ему нужна именно `OG_REV`.
 - Шрифты не передаются: встроенный в `next/og` Geist Regular покрывает казахские буквы. Свой TTF в `fonts` заменяет встроенный целиком; woff2 не поддерживается. Перед добавлением TTF проверьте глифы: `node scripts/check-font-glyphs.mjs <font.ttf>` (нужны `ӘәҒғҚқҢңӨөҰұҮүҺһІі—·№`).
 
 ---
@@ -116,7 +116,7 @@
 
 - прелоад и fallback с подстройкой метрик (`adjustFontFallback: "Arial"`);
 - в CSS — `var(--font-geist)`;
-- `next/font/google` не использовать: у его Geist нет subset `cyrillic-ext`, и казахские буквы ушли бы в fallback.
+- `next/font/google` не используем намеренно: файл шрифта зафиксирован в репозитории, и сборка не ходит в Google Fonts. Казахские буквы у Geist из Google есть (subset `cyrillic-ext`); при переходе указать `subsets: ["latin", "cyrillic", "cyrillic-ext"]`, иначе эти начертания не попадут в preload и загрузятся с задержкой.
 
 **Иконки**: `src/app/icon.svg`, `apple-icon.png`, `favicon.ico`, `public/icons/{icon-192,icon-512,maskable-512}.png`. Генерируются один раз командой `node scripts/make-icons.mjs` из `public/images/landing/bilimai-mark.svg` (sharp из зависимостей next). Результат коммитится.
 
@@ -130,7 +130,9 @@
 | логотипы партнёров | `src/assets/landing/partners/*.png` | `220px` | `lazy`; в CSS `height: auto` (атрибут `height` иначе станет CSS-высотой) |
 | обложка поста | `public/images/blog/<slug>/cover-*.jpg` | `(max-width: 760px) 100vw, 720px` | `eager` + `fetchPriority="high"` |
 
-`sizes` измерены в браузере на ширинах 390–1920. Не используйте `fill`: его инлайновые стили ломают split-раскладку. `priority`/`preload` тоже не нужны. React 19 сам прелоадит каждый `<img>` без `loading="lazy"`, поэтому в HTML ровно 3 preload картинок: логотип и две hero-обложки.
+`sizes` измерены в браузере на ширинах 390–1920; у логотипов партнёров `sizes` = их `--partner-width`.
+
+**Кэш оптимизации.** Каждый промах кэша `/_next/image` на Vercel — платная трансформация (на Hobby при превышении квоты новые картинки отдают 402), AVIF и WebP считаются отдельно. Поэтому `images.minimumCacheTTL` = 31 день, а `/images/blog/*` отдаются с `immutable`: обложки названы по хешу содержимого. Не используйте `fill`: его инлайновые стили ломают split-раскладку. `priority`/`preload` тоже не нужны. React 19 сам прелоадит каждый `<img>` без `loading="lazy"`, поэтому в HTML ровно 3 preload картинок: логотип и две hero-обложки.
 
 **Reveal-анимация**: блоки с `data-reveal` скрываются только под `body.js`. Класс ставит inline-скрипт первым потомком `<body>`, поэтому без JS (и для краулеров) текст виден сразу. У `.hero-copy` атрибута `data-reveal` нет: h1 не ждёт JS.
 
@@ -151,11 +153,14 @@
 
 ## Как добавить язык
 
-1. Код в `LOCALES`, `LANGUAGE_OPTIONS`, `OG_LOCALE` (`src/i18n/config.ts`).
+1. Код в `LOCALES`, `LANGUAGE_OPTIONS`, `OG_LOCALE` (`src/i18n/config.ts`) и в `SITE.languages` (`src/lib/site.ts`: `knowsLanguage`/`inLanguage` в JSON-LD).
 2. Словарь в `src/i18n/messages.js` и `dictionaries.ts`; строка в `META` (`src/i18n/meta.ts`).
-3. Языковые альтернативы в `[lang]/page.tsx` и `sitemap.ts`.
+3. hreflang в `[lang]/page.tsx` (список задан явно); `sitemap.ts` подхватит `LOCALES` сам.
 4. Правило `Accept-Language` подхватится из `LOCALES` автоматически. Проверьте порядок: важен первый тег.
-5. Блог на новом языке — отдельное решение: формат пакета на бэкенде знает только `ru` и `kk` (см. [BLOG.md](./BLOG.md)).
+5. Блог на новом языке — отдельное решение: формат пакета на бэкенде знает только `ru` и `kk` (см. [BLOG.md](./BLOG.md)). Без своего блога язык ведётся в `ru`, как сейчас `en`, в трёх местах:
+   - фолбэк в `blogUrl` (`Landing.jsx`) — ссылки «Блог» в навигации и футере;
+   - RSS-ссылка `alternates.types` в `[lang]/page.tsx`;
+   - редиректы `/<код>/blog` и `/<код>/blog/:path*` → `/ru/blog…` в `next.config.ts`.
 6. Тексты 404 в `global-not-found.tsx`, `llms.txt`, этот документ.
 
 ---
@@ -166,8 +171,8 @@
 - `.env.local` нужен только для dev-стенда. Без него используются прод-фолбэки. При сборке с `NEXT_PUBLIC_APP_URL` ссылки уйдут на dev.
 - Ожидаемая таблица сборки:
   - `● /[lang]` (kk, ru, en), `● /[lang]/opengraph-image` ×3;
-  - `● /[lang]/blog`, `● /[lang]/blog/[slug]`, `● /[lang]/feed.xml` (ru, kk);
-  - `○ /sitemap.xml`, `○ /robots.txt`, `○ /manifest.webmanifest`, `○ /_not-found`;
+  - `● /[lang]/blog` (kk, ru, en — `/en/blog` пререндерится из параметров корневого layout, в рантайме его перехватывает редирект на `/ru/blog`), `● /[lang]/blog/[slug]` и `● /[lang]/feed.xml` (ru, kk);
+  - `○ /sitemap.xml`, `○ /robots.txt`, `○ /manifest.webmanifest`, `○ /apple-icon.png`, `○ /icon.svg`, `○ /_not-found`;
   - единственный `ƒ /api/waitlist`.
 
 ## Чек-лист проверки

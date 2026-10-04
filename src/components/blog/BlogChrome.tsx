@@ -1,51 +1,91 @@
 import { BLOG_LOCALES, type BlogLocale } from "@/lib/blog/types";
-import { blogPath } from "@/lib/blog/posts";
+import { blogPath, type Post, postPath } from "@/lib/blog/posts";
 import { BLOG_UI } from "@/lib/blog/ui";
 import { SITE } from "@/lib/site";
 
 // Шапка и подвал блога — серверные, на классах лендинга (.nav-shell,
-// .brand, .footer). Без клиентского JS: блог — статический текст.
+// .brand, .footer). Без клиентского JS: блог — статический текст. Их
+// рендерит страница, а не layout: только она знает, куда вести языковые
+// ссылки (у поста — на его перевод).
 
-const LANGUAGE_LABEL: Record<BlogLocale, string> = { ru: "Русский", kk: "Қазақша" };
+const LANGUAGE_LABEL: Record<BlogLocale, { long: string; short: string }> = {
+  ru: { long: "Русский", short: "RU" },
+  kk: { long: "Қазақша", short: "ҚАЗ" },
+};
 const LOGO = "/images/landing/new-bilimai-logo.svg";
 
-function LanguageLinks({ lang }: { lang: BlogLocale }) {
+export type LanguageLink = { lang: BlogLocale; href: string; current: boolean };
+
+// Языковые версии индекса блога.
+export function indexLanguages(lang: BlogLocale): LanguageLink[] {
+  return BLOG_LOCALES.map((code) => ({ lang: code, href: blogPath(code), current: code === lang }));
+}
+
+// Языковые версии поста: перевод, если он есть, иначе индекс блога.
+export function postLanguages(post: Post, translations: Post[]): LanguageLink[] {
+  return BLOG_LOCALES.map((code) => {
+    const other = translations.find((t) => t.lang === code);
+    return {
+      lang: code,
+      href: other ? postPath(other.lang, other.slug) : blogPath(code),
+      current: code === post.lang,
+    };
+  });
+}
+
+function LanguageLinks({ languages, compact }: { languages: LanguageLink[]; compact?: boolean }) {
   return (
     <>
-      {BLOG_LOCALES.map((code) => (
+      {languages.map(({ lang, href, current }) => (
         <a
-          key={code}
-          href={blogPath(code)}
-          hrefLang={code}
-          lang={code}
-          aria-current={code === lang ? "page" : undefined}
+          key={lang}
+          href={href}
+          hrefLang={lang}
+          lang={lang}
+          aria-current={current ? "page" : undefined}
+          aria-label={compact ? LANGUAGE_LABEL[lang].long : undefined}
         >
-          {LANGUAGE_LABEL[code]}
+          {compact ? (
+            <>
+              <span className="blog-lang__long">{LANGUAGE_LABEL[lang].long}</span>
+              <span className="blog-lang__short">{LANGUAGE_LABEL[lang].short}</span>
+            </>
+          ) : (
+            LANGUAGE_LABEL[lang].long
+          )}
         </a>
       ))}
     </>
   );
 }
 
-export function BlogHeader({ lang }: { lang: BlogLocale }) {
+export function BlogHeader({
+  lang,
+  languages,
+  isIndex,
+}: {
+  lang: BlogLocale;
+  languages: LanguageLink[];
+  isIndex: boolean;
+}) {
   const ui = BLOG_UI[lang];
   return (
     <header className="site-header" id="top">
-      <nav className="nav-shell blog-nav" aria-label={ui.blog}>
+      <nav className="nav-shell blog-nav" aria-label={ui.mainNav}>
         <a className="brand" href={`/${lang}`} aria-label={`Bilim AI — ${ui.home}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={LOGO} alt="Bilim AI" />
         </a>
         <div className="blog-nav__links">
           <a href={`/${lang}`}>{ui.home}</a>
-          <a href={blogPath(lang)} aria-current="page">
+          <a href={blogPath(lang)} aria-current={isIndex ? "page" : undefined}>
             {ui.blog}
           </a>
           <a href={`${SITE.appOrigin}/marketplace`}>{ui.gallery}</a>
         </div>
         <div className="blog-nav__aside">
-          <span className="blog-nav__languages" aria-label={ui.language}>
-            <LanguageLinks lang={lang} />
+          <span className="blog-nav__languages" role="group" aria-label={ui.language}>
+            <LanguageLinks languages={languages} compact />
           </span>
           <a className="nav-login" href={`${SITE.appOrigin}/login`}>
             {ui.login}
@@ -56,7 +96,7 @@ export function BlogHeader({ lang }: { lang: BlogLocale }) {
   );
 }
 
-export function BlogFooter({ lang }: { lang: BlogLocale }) {
+export function BlogFooter({ lang, languages }: { lang: BlogLocale; languages: LanguageLink[] }) {
   const ui = BLOG_UI[lang];
   return (
     <footer className="footer section-pad blog-footer">
@@ -80,7 +120,7 @@ export function BlogFooter({ lang }: { lang: BlogLocale }) {
           </div>
           <div>
             <strong>{ui.language}</strong>
-            <LanguageLinks lang={lang} />
+            <LanguageLinks languages={languages} />
           </div>
         </div>
       </div>
