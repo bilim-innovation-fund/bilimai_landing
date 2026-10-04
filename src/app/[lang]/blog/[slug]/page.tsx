@@ -33,14 +33,12 @@ export function generateStaticParams() {
   return getAllPosts().map((post) => ({ lang: post.lang, slug: post.slug }));
 }
 
-// Отдельный import() на язык: Turbopack собирает контекст по шаблону пути.
+// Turbopack собирает контекст import() по шаблону пути на сборке, и пустой
+// контекст — ошибка сборки. Поэтому один шаблон на все языки, а
+// src/content/blog/_template/post.mdx (его не читают ни posts.ts, ни
+// валидатор) держит контекст непустым, даже когда постов нет.
 async function loadBody(lang: BlogLocale, slug: string) {
-  switch (lang) {
-    case "kk":
-      return (await import(`@/content/blog/kk/${slug}.mdx`)).default;
-    case "ru":
-      return (await import(`@/content/blog/ru/${slug}.mdx`)).default;
-  }
+  return (await import(`@/content/blog/${lang}/${slug}.mdx`)).default;
 }
 
 async function resolvePost(params: Props["params"]) {
