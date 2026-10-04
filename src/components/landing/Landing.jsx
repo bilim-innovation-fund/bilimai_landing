@@ -60,7 +60,12 @@ import independenceKazakhstanCover from "@/assets/landing/covers/independence-ka
 import geometricSequencesCover from "@/assets/landing/covers/geometric-sequences.jpg"
 import combinedEventsCover from "@/assets/landing/covers/combined-events.jpg"
 import graphingLinesCover from "@/assets/landing/covers/graphing-lines.jpg"
-import { FAQ_ITEMS } from "@/content/landing"
+import {
+	ABOUT_CAPSULE,
+	ABOUT_TITLE,
+	FAQ_ITEMS,
+	HERO_EYEBROW,
+} from "@/content/landing"
 import { LANGUAGE_OPTIONS, LOCALE_COOKIE } from "@/i18n/config"
 import { createTranslator } from "@/i18n/translate"
 
@@ -392,7 +397,7 @@ function WaitlistModal({ open, onClose }) {
 							</h2>
 							<p>
 								{t(
-									"Участникам списка ожидания мы откроем все премиум-функции на старте — бесплатно.",
+									"Мы напишем вам, когда откроем доступ.",
 								)}
 							</p>
 						</header>
@@ -1217,8 +1222,8 @@ function Hero({ onWaitlistOpen }) {
 				{/* Без data-reveal: заголовок первого экрана не должен ждать JS. */}
 				<div className='hero-copy'>
 					<div className='eyebrow'>
-						<span className='eyebrow__accent'>{t("Скоро!")}</span>
-						<span>{t("Платформа в разработке")}</span>
+						<span className='eyebrow__accent'>{t(HERO_EYEBROW.accent)}</span>
+						<span>{t(HERO_EYEBROW.text)}</span>
 					</div>
 					<h1 id='hero-title'>
 						<span>{t("Единое пространство")}</span>{" "}
@@ -1497,6 +1502,24 @@ function PlatformPillarVisual({ type }) {
 				)}
 			</div>
 		</div>
+	)
+}
+
+// Ответ-капсула: короткий самодостаточный ответ «что это», который
+// поисковики и ИИ-ассистенты могут цитировать целиком.
+function About() {
+	const { t } = useI18n()
+	return (
+		<section
+			className='about section-pad'
+			id='about'
+			aria-labelledby='about-title'
+		>
+			<div className='about__inner' data-reveal>
+				<h2 id='about-title'>{t(ABOUT_TITLE)}</h2>
+				<p>{t(ABOUT_CAPSULE)}</p>
+			</div>
+		</section>
 	)
 }
 
@@ -2253,7 +2276,7 @@ function FinalCta({ onWaitlistOpen }) {
 			</div>
 			<div
 				className='marketplace-ribbons'
-				aria-label={t("Уроки из маркетплейса Bilim AI")}
+				aria-label={t("Уроки из Галереи материалов Bilim AI")}
 			>
 				<MarketplaceRibbon lessons={MARKETPLACE_LESSONS.slice(0, 6)} />
 				<MarketplaceRibbon
@@ -2337,6 +2360,7 @@ export default function App({ lang, messages }) {
 			</header>
 			<main id='main'>
 				<Hero onWaitlistOpen={() => setWaitlistOpen(true)} />
+				<About />
 				<PlatformOverview />
 				<PartnerMarquee />
 				<SecondaryFeatures />

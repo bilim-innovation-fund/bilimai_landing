@@ -3280,6 +3280,32 @@ body.js [data-reveal]:not(.is-visible) {
   font-size: 12px;
 }
 
+/* About: ответ-капсула «Что такое Bilim AI?» сразу после hero */
+.about {
+  padding-top: 96px;
+}
+
+.about__inner {
+  display: grid;
+  grid-template-columns: 0.75fr 1.25fr;
+  gap: 90px;
+  align-items: start;
+}
+
+.about__inner h2 {
+  font-size: clamp(32px, 3.4vw, 48px);
+  font-weight: 560;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+}
+
+.about__inner p {
+  max-width: 760px;
+  color: #3f4441;
+  font-size: clamp(18px, 1.45vw, 21px);
+  line-height: 1.55;
+}
+
 /* Platform overview */
 .platform-overview {
   padding-top: 72px;
@@ -5180,6 +5206,15 @@ body.js [data-reveal]:not(.is-visible) {
   .faq {
     grid-template-columns: 1fr;
     gap: 46px;
+  }
+
+  .about {
+    padding-top: 64px;
+  }
+
+  .about__inner {
+    grid-template-columns: 1fr;
+    gap: 18px;
   }
 }
 
