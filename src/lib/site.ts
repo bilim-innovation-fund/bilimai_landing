@@ -10,7 +10,7 @@ export const SITE = {
   // Корень с завершающим слэшем: x-default и url сущностей.
   root: "https://bilimai.kz/",
   appOrigin: "https://app.bilimai.kz",
-  apiOrigin: "https://api.app.bilimai.kz",
+  apiOrigin: "https://api.bilimai.kz",
   brand: "Bilim AI",
   alternateNames: ["BilimAI", "Білім AI", "Билим AI"],
   sameAs: ["https://github.com/bilim-innovation-fund"],

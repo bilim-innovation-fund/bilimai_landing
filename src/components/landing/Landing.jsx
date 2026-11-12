@@ -78,7 +78,7 @@ const bilimLogo = `${ASSET_ROOT}/new-bilimai-logo.svg`
 // проверяем прод-сессию и уводим на прод-платформу; для дев-стенда задайте
 // NEXT_PUBLIC_API_ORIGIN / NEXT_PUBLIC_APP_URL — env перебивает фолбэк.
 const API_ORIGIN = (
-	process.env.NEXT_PUBLIC_API_ORIGIN || "https://api.app.bilimai.kz"
+	process.env.NEXT_PUBLIC_API_ORIGIN || "https://api.bilimai.kz"
 ).replace(/\/$/, "")
 const PLATFORM_URL = (
 	process.env.NEXT_PUBLIC_APP_URL || "https://app.bilimai.kz"

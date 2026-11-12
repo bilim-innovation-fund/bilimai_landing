@@ -24,7 +24,7 @@ corepack pnpm@10.34.6 exec tsc --noEmit
 
 ## Окружение
 
-Доступа к env-переменным Vercel у команды нет, поэтому продовые адреса зашиты в код (`https://bilimai.kz`, `https://app.bilimai.kz`, `https://api.app.bilimai.kz` — `src/lib/site.ts` и фолбэки в `src/components/landing/Landing.jsx`). `.env.local` нужен только для dev-стенда (см. `.env.example`): переменные `NEXT_PUBLIC_*` перебивают прод-фолбэки. Прод-сборку с ними не делайте.
+Доступа к env-переменным Vercel у команды нет, поэтому продовые адреса зашиты в код (`https://bilimai.kz`, `https://app.bilimai.kz`, `https://api.bilimai.kz` — `src/lib/site.ts` и фолбэки в `src/components/landing/Landing.jsx`). `.env.local` нужен только для dev-стенда (см. `.env.example`): переменные `NEXT_PUBLIC_*` перебивают прод-фолбэки. Прод-сборку с ними не делайте.
 
 ## Документация
 
