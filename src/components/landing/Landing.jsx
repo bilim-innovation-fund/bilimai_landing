@@ -87,8 +87,15 @@ const WAITLIST_PROXY_ENDPOINT = "/api/waitlist"
 const WAITLIST_API_ENDPOINT =
 	process.env.NEXT_PUBLIC_WAITLIST_API_URL ||
 	"https://api.dev.bilimai.kz/api/v1/auth/waitlist/"
-const appUrl = (path) => `${PLATFORM_URL}${path}`
-const LOGIN_URL = `${PLATFORM_URL}/login`
+// Платформа — другой origin, общего хранилища с ней нет, поэтому язык
+// передаём в ссылке: app.bilimai.kz/login?lang=ru. Платформа ставит его выше
+// своего сохранённого выбора, запоминает и убирает из адреса
+// (ai_platform_front/src/i18n/handoff.js). Шлём свои коды kk/ru/en — kk она
+// сама переводит в свой kz. Редирект залогиненного на /dashboard идёт без
+// языка: там решает язык из профиля аккаунта.
+const appUrl = (path, language) =>
+	`${PLATFORM_URL}${path}${path.includes("?") ? "&" : "?"}lang=${encodeURIComponent(language)}`
+const loginUrl = (language) => appUrl("/login", language)
 // Блог только на ru и kk: с английской версии ведём в русский.
 const blogUrl = (language) => `/${language === "en" ? "ru" : language}/blog`
 const WHATSAPP_NUMBER_ERROR =
@@ -691,7 +698,7 @@ function Navigation() {
 				<div className='nav-actions'>
 					<a
 						className='nav-login'
-						href={LOGIN_URL}
+						href={loginUrl(language)}
 						onClick={() => setOpen(false)}
 					>
 						{t("Войти")}
@@ -1217,7 +1224,7 @@ function FloatingLibrary() {
 }
 
 function Hero({ onWaitlistOpen }) {
-	const { t } = useI18n()
+	const { language, t } = useI18n()
 	return (
 		<section className='hero' aria-labelledby='hero-title'>
 			<div className='hero-stage'>
@@ -1248,7 +1255,7 @@ function Hero({ onWaitlistOpen }) {
 					    на секцию ниже — это прокрутка, а не переход, и кнопкой он
 					    притворялся зря. */}
 					<div className='hero-copy__actions'>
-						<a className='button button--primary' href={LOGIN_URL}>
+						<a className='button button--primary' href={loginUrl(language)}>
 							{t("Начать")}
 							<ArrowRight
 								size={17}
@@ -2189,7 +2196,7 @@ function MarketplaceLessonCard({
 	linked = false,
 	eager = false,
 }) {
-	const { t } = useI18n()
+	const { language, t } = useI18n()
 	const Card = linked ? "a" : "div"
 	const translatedTitle = t(lesson.title)
 
@@ -2198,7 +2205,10 @@ function MarketplaceLessonCard({
 			className={`marketplace-lesson-card marketplace-lesson-card--${lesson.layout}`}
 			href={
 				linked
-					? appUrl(`/marketplace/lesson/${lesson.slug || lesson.id}`)
+					? appUrl(
+							`/marketplace/lesson/${lesson.slug || lesson.id}`,
+							language,
+						)
 					: undefined
 			}
 			style={{ "--lesson-accent": lesson.accent }}
@@ -2315,7 +2325,9 @@ function Footer() {
 						<a href='#workflow'>{t("Как работает")}</a>
 						<a href='#classes'>{t("Для классов")}</a>
 						<a href='#faq'>{t("Частые вопросы")}</a>
-						<a href={appUrl("/marketplace")}>{t("Галерея материалов")}</a>
+						<a href={appUrl("/marketplace", language)}>
+							{t("Галерея материалов")}
+						</a>
 						{BLOG_ENABLED ? (
 							<a href={blogUrl(language)}>{t("Блог")}</a>
 						) : null}

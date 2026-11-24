@@ -14,6 +14,10 @@ const LANGUAGE_LABEL: Record<BlogLocale, { long: string; short: string }> = {
 };
 const LOGO = "/images/landing/new-bilimai-logo.svg";
 
+// Ссылка на платформу с языком страницы: платформа подхватит ?lang= и
+// откроется на нём же (как и ссылки лендинга, см. appUrl в Landing.jsx).
+const appLink = (path: string, lang: BlogLocale) => `${SITE.appOrigin}${path}?lang=${lang}`;
+
 export type LanguageLink = { lang: BlogLocale; href: string; current: boolean };
 
 // Языковые версии индекса блога.
@@ -81,13 +85,13 @@ export function BlogHeader({
           <a href={blogPath(lang)} aria-current={isIndex ? "page" : undefined}>
             {ui.blog}
           </a>
-          <a href={`${SITE.appOrigin}/marketplace`}>{ui.gallery}</a>
+          <a href={appLink("/marketplace", lang)}>{ui.gallery}</a>
         </div>
         <div className="blog-nav__aside">
           <span className="blog-nav__languages" role="group" aria-label={ui.language}>
             <LanguageLinks languages={languages} compact />
           </span>
-          <a className="nav-login" href={`${SITE.appOrigin}/login`}>
+          <a className="nav-login" href={appLink("/login", lang)}>
             {ui.login}
           </a>
         </div>
@@ -113,7 +117,7 @@ export function BlogFooter({ lang, languages }: { lang: BlogLocale; languages: L
             <strong>Bilim AI</strong>
             <a href={`/${lang}`}>{ui.home}</a>
             <a href={blogPath(lang)}>{ui.blog}</a>
-            <a href={`${SITE.appOrigin}/marketplace`}>{ui.gallery}</a>
+            <a href={appLink("/marketplace", lang)}>{ui.gallery}</a>
             <a href={`/${lang}/feed.xml`} type="application/rss+xml">
               {ui.rss}
             </a>
